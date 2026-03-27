@@ -27,12 +27,12 @@
 <meta property="og:site_name" content="zbh Blog">
 <meta property="og:description" content="背包dp1.01背包：每个物品只能选一次，即要么选，要么不选。 12345678910111213141516171819int zeroOneBag(vector&lt;int&gt;&amp; weight, vector&lt;int&gt;&amp; value, int bagCapacity) &#123;    int n &#x3D; weight.size();    &#x2F;&#x2F; dp[i][j">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://zbh13782-lang.github.io/images/hp.png">
+<meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
 <meta property="article:published_time" content="2026-03-27T07:26:41.779Z">
 <meta property="article:modified_time" content="2026-03-27T07:39:59.804Z">
 <meta property="article:author" content="zbh">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://zbh13782-lang.github.io/images/hp.png">
+<meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
   
   
   
@@ -48,13 +48,13 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/images/hp.png"},"dateCreated":"2026-03-27T15:26:41+08:00","dateModified":"2026-03-27T15:39:59+08:00","datePublished":"2026-03-27T15:26:41+08:00","description":"","headline":"背包dp，状态机dp","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/03/27/dp/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/03/27/dp/","thumbnailUrl":null,"image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-03-27T15:26:41+08:00","dateModified":"2026-03-27T15:39:59+08:00","datePublished":"2026-03-27T15:26:41+08:00","description":"","headline":"背包dp，状态机dp","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/03/27/dp/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/03/27/dp/","thumbnailUrl":null,"image":[]}</script>
   
 </head>
 <body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
 
 
-<header class="header"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
 <div style="text-align: center; margin-top: 10px;"><a href="https://codetime.dev" target="_blank" rel="external nofollow noopener noreferrer"><img no-lazy style="display: block; margin: 0 auto;" src="https://shields.jannchie.com/endpoint?style=social&color=222&url=https%3A%2F%2Fapi.codetime.dev%2Fv3%2Fusers%2Fshield%3Fuid%3D35418" alt="CodeTime Badge" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a></div>
 <div class="nav-area">
 
