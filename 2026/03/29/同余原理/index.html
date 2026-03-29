@@ -17,19 +17,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>多cpu的调度 - zbh Blog</title>
+  <title>同余原理 - zbh Blog</title>
 
   
-    <meta name="description" content="主要考虑问题：cpu亲和性，负载均衡 方案一：公共就绪队列所有PCB按照某种调度算法排列好，依次上cpu跑 天然解决了负载均衡问题 问题：浪费cpuCache，亲和性差解决：软亲和：cpu自己解决硬亲和：程序员编写程序时候指定进程去哪个cpu 方案二:私有就绪队列所有PCB上来就分配好去哪个cpu 天然解决了亲和性问题 负载均衡的解决方案： push：哪个cpu负载大，就推一些进程去其他cpupu">
+    <meta name="description" content="先给结论：1.加法：(a + b) mod c &#x3D; (a mod c + b mod c) mod c2.减法: (a - b) mod c &#x3D; (a mod c - b mod c + c) mod c3.乘法:(a * b) mod c &#x3D; (a mod c * b mod c) mod c4.除法:(a &#x2F;&#x2F; b)mod c &#x3D; (">
 <meta property="og:type" content="article">
-<meta property="og:title" content="多cpu的调度">
-<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/">
+<meta property="og:title" content="同余原理">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/">
 <meta property="og:site_name" content="zbh Blog">
-<meta property="og:description" content="主要考虑问题：cpu亲和性，负载均衡 方案一：公共就绪队列所有PCB按照某种调度算法排列好，依次上cpu跑 天然解决了负载均衡问题 问题：浪费cpuCache，亲和性差解决：软亲和：cpu自己解决硬亲和：程序员编写程序时候指定进程去哪个cpu 方案二:私有就绪队列所有PCB上来就分配好去哪个cpu 天然解决了亲和性问题 负载均衡的解决方案： push：哪个cpu负载大，就推一些进程去其他cpupu">
+<meta property="og:description" content="先给结论：1.加法：(a + b) mod c &#x3D; (a mod c + b mod c) mod c2.减法: (a - b) mod c &#x3D; (a mod c - b mod c + c) mod c3.乘法:(a * b) mod c &#x3D; (a mod c * b mod c) mod c4.除法:(a &#x2F;&#x2F; b)mod c &#x3D; (">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
-<meta property="article:published_time" content="2026-03-26T15:47:13.276Z">
-<meta property="article:modified_time" content="2026-03-26T15:58:53.969Z">
+<meta property="article:published_time" content="2026-03-29T14:34:04.549Z">
+<meta property="article:modified_time" content="2026-03-29T14:35:17.937Z">
 <meta property="article:author" content="zbh">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
@@ -48,7 +48,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-03-26T23:47:13+08:00","dateModified":"2026-03-26T23:58:53+08:00","datePublished":"2026-03-26T23:47:13+08:00","description":"","headline":"多cpu的调度","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-03-29T22:34:04+08:00","dateModified":"2026-03-29T22:35:17+08:00","datePublished":"2026-03-29T22:34:04+08:00","description":"","headline":"同余原理","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/","thumbnailUrl":null,"image":[]}</script>
   
 </head>
 <body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -77,27 +77,23 @@
 <div class="article banner top">
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
-<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-03-26T15:47:13.276Z">2026-03-26</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-03-26T15:58:53.969Z">2026-03-26</time></span></div></div></div>
+<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95/">基本算法</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-03-29T14:34:04.549Z">2026-03-29</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-03-29T14:35:17.937Z">2026-03-29</time></span></div></div></div>
     
     <div class="bottom only-title">
       
       <div class="text-area">
-        <h1 class="text title"><span>多cpu的调度</span></h1>
+        <h1 class="text title"><span>同余原理</span></h1>
         
       </div>
     </div>
     
   </div>
-  </div><article class="md-text content"><p>主要考虑问题：cpu亲和性，负载均衡</p>
-<h5 id="方案一：公共就绪队列"><a href="#方案一：公共就绪队列" class="headerlink" title="方案一：公共就绪队列"></a>方案一：公共就绪队列</h5><p>所有PCB按照某种调度算法排列好，依次上cpu跑</p>
-<p>天然解决了负载均衡问题</p>
-<p>问题：浪费cpuCache，亲和性差<br>解决：<br>软亲和：cpu自己解决<br>硬亲和：程序员编写程序时候指定进程去哪个cpu</p>
-<h5 id="方案二-私有就绪队列"><a href="#方案二-私有就绪队列" class="headerlink" title="方案二:私有就绪队列"></a>方案二:私有就绪队列</h5><p>所有PCB上来就分配好去哪个cpu</p>
-<p>天然解决了亲和性问题</p>
-<p>负载均衡的解决方案：</p>
-<p>push：哪个cpu负载大，就推一些进程去其他cpu<br>pull：cpu负载小的时候就偷其他cpu的进程</p>
-<p>问题：由于push和pull，也会出现亲和性不好</p>
+  </div><article class="md-text content"><h2 id="先给结论："><a href="#先给结论：" class="headerlink" title="先给结论："></a>先给<strong>结论</strong>：</h2><p>1.加法：(a + b) mod c &#x3D; (a mod c + b mod c) mod c<br>2.减法: (a - b) mod c &#x3D; (a mod c - b mod c + c) mod c<br>3.乘法:(a * b) mod c &#x3D; (a mod c * b mod c) mod c<br>4.除法:(a &#x2F;&#x2F; b)mod c &#x3D; (a * b‘ )mod c<br>逆元计算方法：<br>$$<br>b^{c-2} \equiv b^{-1} \pmod c<br>$$</p>
+<h2 id="Q-A"><a href="#Q-A" class="headerlink" title="Q &amp; A"></a>Q &amp; A</h2><p>减法为什么不一样？<br>例如 a &#x3D; 2,b &#x3D; 8,c &#x3D; 5</p>
+<p>不 + c:<br>a mod c &#x3D; 2,b mod c &#x3D; 3<br>2 - 3 &#x3D; -1 ?</p>
+<p>+c就是为了转为正数<br>(a mod c - b mod c + c) mod c &#x3D; (-1+5)%5&#x3D;4</p>
+<p>$$<br>对于b^{c-2}，可以用快速幂，pow(b,c-2,c)<br>$$<br>pow(x,y,z)函数是Python内置函数,计算 x ** y % c</p>
 </article>
 <div class="article-footer">
     <section id="license">
@@ -109,7 +105,7 @@
 
 </div>
 
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/myblog/2026/03/26/%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E5%92%8C%E4%BA%92%E6%96%A5/">进程的同步和互斥</a></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/03/26/hello-world/">hello,world</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/03/27/dp/">背包dp，状态机dp</a></div></section></div>
 
 
 
@@ -125,7 +121,7 @@
 
 
 
-<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80%EF%BC%9A%E5%85%AC%E5%85%B1%E5%B0%B1%E7%BB%AA%E9%98%9F%E5%88%97"><span class="toc-text">方案一：公共就绪队列</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C-%E7%A7%81%E6%9C%89%E5%B0%B1%E7%BB%AA%E9%98%9F%E5%88%97"><span class="toc-text">方案二:私有就绪队列</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%BB%99%E7%BB%93%E8%AE%BA%EF%BC%9A"><span class="toc-text">先给结论：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Q-A"><span class="toc-text">Q &amp; A</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
@@ -139,7 +135,7 @@
 
 <script type="text/javascript">
   window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
-  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/","checklink":"/js/plugins/video.js"};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/","checklink":"/js/plugins/video.js"};
   // Fix: Ensure page is at the correct top position on data load
   if (history.scrollRestoration) {
     history.scrollRestoration = 'auto';
