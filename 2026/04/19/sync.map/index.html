@@ -17,19 +17,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>同余原理 - zbh Blog</title>
+  <title>sync.map - zbh Blog</title>
 
   
-    <meta name="description" content="先给结论： 1.加法：(a + b) mod c &#x3D; (a mod c + b mod c) mod c 2.减法: (a - b) mod c &#x3D; (a mod c - b mod c + c) mod c 3.乘法:(a * b) mod c &#x3D; (a mod c * b mod c) mod c 4.除法:(a &#x2F;&#x2F; b)mod c &#x3D; (a * b‘ )mod c 逆元计算方法： bc−">
+    <meta name="description" content="sync.Map的底层原理 123456789101112131415type Map struct &#123;    mu Mutex                     &#x2F;&#x2F; 保护 dirty 的互斥锁    read atomic.Value            &#x2F;&#x2F; 只读的 readOnly 结构（原子访问）    dirty map[interface&#123;&#125;]">
 <meta property="og:type" content="article">
-<meta property="og:title" content="同余原理">
-<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/">
+<meta property="og:title" content="sync.map">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/04/19/sync.map/">
 <meta property="og:site_name" content="zbh Blog">
-<meta property="og:description" content="先给结论： 1.加法：(a + b) mod c &#x3D; (a mod c + b mod c) mod c 2.减法: (a - b) mod c &#x3D; (a mod c - b mod c + c) mod c 3.乘法:(a * b) mod c &#x3D; (a mod c * b mod c) mod c 4.除法:(a &#x2F;&#x2F; b)mod c &#x3D; (a * b‘ )mod c 逆元计算方法： bc−">
+<meta property="og:description" content="sync.Map的底层原理 123456789101112131415type Map struct &#123;    mu Mutex                     &#x2F;&#x2F; 保护 dirty 的互斥锁    read atomic.Value            &#x2F;&#x2F; 只读的 readOnly 结构（原子访问）    dirty map[interface&#123;&#125;]">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
-<meta property="article:published_time" content="2026-03-29T14:34:04.549Z">
-<meta property="article:modified_time" content="2026-03-29T14:46:34.323Z">
+<meta property="article:published_time" content="2026-04-19T14:44:34.307Z">
+<meta property="article:modified_time" content="2026-04-19T14:45:29.218Z">
 <meta property="article:author" content="zbh">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
@@ -48,7 +48,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-03-29T22:34:04+08:00","dateModified":"2026-03-29T22:46:34+08:00","datePublished":"2026-03-29T22:34:04+08:00","description":"","headline":"同余原理","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/","thumbnailUrl":null,"image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-04-19T22:44:34+08:00","dateModified":"2026-04-19T22:45:29+08:00","datePublished":"2026-04-19T22:44:34+08:00","description":"","headline":"sync.map","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/04/19/sync.map/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/04/19/sync.map/","thumbnailUrl":null,"image":[]}</script>
   
 </head>
 <body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -77,37 +77,70 @@
 <div class="article banner top">
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
-<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95/">基本算法</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-03-29T14:34:04.549Z">2026-03-29</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-03-29T14:46:34.323Z">2026-03-29</time></span></div></div></div>
+<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/Golang/">Golang</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-04-19T14:44:34.307Z">2026-04-19</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-04-19T14:45:29.218Z">2026-04-19</time></span></div></div></div>
     
     <div class="bottom only-title">
       
       <div class="text-area">
-        <h1 class="text title"><span>同余原理</span></h1>
+        <h1 class="text title"><span>sync.map</span></h1>
         
       </div>
     </div>
     
   </div>
-  </div><article class="md-text content"><h2 id="先给结论"><a class="markdownIt-Anchor" href="#先给结论"></a> 先给<strong>结论</strong>：</h2>
-<p>1.加法：(a + b) mod c = (a mod c + b mod c) mod c<br />
-2.减法: (a - b) mod c = (a mod c - b mod c + c) mod c<br />
-3.乘法:(a * b) mod c = (a mod c * b mod c) mod c<br />
-4.除法:(a // b)mod c = (a * b‘ )mod c<br />
-逆元计算方法：</p>
-<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msup><mi>b</mi><mrow><mi>c</mi><mo>−</mo><mn>2</mn></mrow></msup><mo>≡</mo><msup><mi>b</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mspace></mspace><mspace width="1em"/><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333333333333333em"/><mi>c</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">b^{c-2} \equiv b^{-1} \pmod c
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.864108em;vertical-align:0em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mbin mtight">−</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≡</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.864108em;vertical-align:0em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right:1em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord mathrm">m</span><span class="mord mathrm">o</span><span class="mord mathrm">d</span></span></span><span class="mspace" style="margin-right:0.3333333333333333em;"></span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span></span></p>
-<h2 id="q-a"><a class="markdownIt-Anchor" href="#q-a"></a> Q &amp; A</h2>
-<p>减法为什么不一样？<br />
-例如 a = 2,b = 8,c = 5</p>
-<p>不 + c:<br />
-a mod c = 2,b mod c = 3<br />
-2 - 3 = -1 ?</p>
-<p>+c就是为了转为正数<br />
-(a mod c - b mod c + c) mod c = (-1+5)%5=4</p>
-<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>对于</mtext><msup><mi>b</mi><mrow><mi>c</mi><mo>−</mo><mn>2</mn></mrow></msup><mtext>，可以用快速幂，</mtext><mi>p</mi><mi>o</mi><mi>w</mi><mo stretchy="false">(</mo><mi>b</mi><mo separator="true">,</mo><mi>c</mi><mo>−</mo><mn>2</mn><mo separator="true">,</mo><mi>c</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">对于b^{c-2}，可以用快速幂，pow(b,c-2,c) 
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1141079999999999em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">对</span><span class="mord cjk_fallback">于</span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.864108em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">c</span><span class="mbin mtight">−</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord cjk_fallback">，</span><span class="mord cjk_fallback">可</span><span class="mord cjk_fallback">以</span><span class="mord cjk_fallback">用</span><span class="mord cjk_fallback">快</span><span class="mord cjk_fallback">速</span><span class="mord cjk_fallback">幂</span><span class="mord cjk_fallback">，</span><span class="mord mathnormal">p</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span></span></p>
-<p>pow(x,y,z)函数是Python内置函数,计算 x ** y % c</p>
+  </div><article class="md-text content"><h3 id="font-stylecolorrgb44-62-80background-color000000fontfont-stylecolorrgb44-62-80syncmap的底层原理font"><a class="markdownIt-Anchor" href="#font-stylecolorrgb44-62-80background-color000000fontfont-stylecolorrgb44-62-80syncmap的底层原理font"></a> <font style="color:rgb(44, 62, 80);background-color:#000000;"></font><font style="color:rgb(44, 62, 80);">sync.Map的底层原理</font></h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Map <span class="keyword">struct</span> &#123;</span><br><span class="line">    mu Mutex                     <span class="comment">// 保护 dirty 的互斥锁</span></span><br><span class="line">    read atomic.Value            <span class="comment">// 只读的 readOnly 结构（原子访问）</span></span><br><span class="line">    dirty <span class="keyword">map</span>[<span class="keyword">interface</span>&#123;&#125;]*entry <span class="comment">// 可写的 map，需要加 mu 锁访问</span></span><br><span class="line">    misses <span class="type">int</span>                   <span class="comment">// 读 miss 计数器</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> readOnly <span class="keyword">struct</span> &#123;</span><br><span class="line">    m       <span class="keyword">map</span>[<span class="keyword">interface</span>&#123;&#125;]*entry</span><br><span class="line">    amended <span class="type">bool</span> <span class="comment">// 为 true 表示 dirty 包含 m 中没有的键</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> entry <span class="keyword">struct</span> &#123;</span><br><span class="line">    p unsafe.Pointer <span class="comment">// *interface&#123;&#125;，支持三种状态</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="关键设计思想"><a class="markdownIt-Anchor" href="#关键设计思想"></a> 关键设计思想</h4>
+<h5 id="1-双-map-设计"><a class="markdownIt-Anchor" href="#1-双-map-设计"></a> 1. <strong>双 map 设计</strong></h5>
+<ul>
+<li><strong>read map</strong>：原子访问，<strong>无需加锁</strong>，用于大多数读操作</li>
+<li><strong>dirty map</strong>：需要 <code>mu</code>锁保护，用于写操作和新键的存储</li>
+<li>两个 map 共享相同的 <code>entry</code>指针，值更新通过原子指针操作完成</li>
+</ul>
+<ol start="2">
+<li><strong>entry 的三种状态</strong></li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// entry.p 的三种状态：</span></span><br><span class="line"><span class="literal">nil</span>       <span class="comment">// 键已删除（在 dirty 中不存在，但 read 中还有标记）</span></span><br><span class="line">expunged  <span class="comment">// 键已删除（dirty 中不存在，特殊标记）</span></span><br><span class="line">正常指针   <span class="comment">// 实际的值指针</span></span><br></pre></td></tr></table></figure>
+<h4 id="一些操作"><a class="markdownIt-Anchor" href="#一些操作"></a> 一些操作</h4>
+<h5 id="1load"><a class="markdownIt-Anchor" href="#1load"></a> 1.load</h5>
+<p>1.先读取read map</p>
+<p>2.若在read map读取到，直接返回</p>
+<p>3.如果没有在read map读到，而且amended = false，就是说dirty和read两个map一样，就说明真的不存在这个东西，返回nil</p>
+<p>4.如果read map没有但是amended = true，就开始加锁在dirty map去读</p>
+<p>在这个过程中可能触发missed &gt; len(dirty)条件</p>
+<h5 id="2store"><a class="markdownIt-Anchor" href="#2store"></a> 2.store</h5>
+<p>更新：read map读到了，而且值正常，更新</p>
+<p>读到了但是expunged，就把数据迁移到dirty中去</p>
+<p>写入：</p>
+<ol>
+<li>
+<p>在 read 中没找到</p>
+</li>
+<li>
+<p>加锁 mu.Lock()</p>
+</li>
+<li>
+<p>再次检查 read（双检查）</p>
+</li>
+<li>
+<p>如果在 dirty 中，直接更新</p>
+</li>
+<li>
+<p>如果是新键：</p>
+<p>a. 如果 read 和 dirty 相同，创建 dirty 副本</p>
+<p>b. 在 dirty 中添加新 entry</p>
+<p>c. 设置 amended=true</p>
+</li>
+<li>
+<p>解锁</p>
+</li>
+</ol>
+<h3 id="readmap-和-dirtymap-的关联"><a class="markdownIt-Anchor" href="#readmap-和-dirtymap-的关联"></a> readmap 和 dirtymap 的关联</h3>
+<p>readmap是dirty的只读缓存，一个key若是在readmap里面 ，那么他就有一个指针p，去记录这个key是不是真的存在，若是nil，表示这个key在dirty不在，但是readmap还没来得及删除，若是expunged，说明两个map都删了</p>
+<p>另外，当dirty里面多次写入，那dirtymap就是自己变成新的readmap（注意这是一次更新，不会丢掉readmap里面的老数据）</p>
+<h3 id="syncmap的使用场景"><a class="markdownIt-Anchor" href="#syncmap的使用场景"></a> sync.Map的使用场景</h3>
+<p>读多写少，要是写太多了，就相当于互斥锁+map，效率大大降低</p>
 </article>
 <div class="article-footer">
     <section id="license">
@@ -119,7 +152,7 @@ a mod c = 2,b mod c = 3<br />
 
 </div>
 
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/">图论 1(建图与排序)</a></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/03/27/dp/">背包dp，状态机dp</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/04/19/Context/">Go的Context</a></div></section></div>
 
 
 
@@ -135,7 +168,7 @@ a mod c = 2,b mod c = 3<br />
 
 
 
-<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%BB%99%E7%BB%93%E8%AE%BA"><span class="toc-text"> 先给结论：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#q-a"><span class="toc-text"> Q &amp; A</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#font-stylecolorrgb44-62-80background-color000000fontfont-stylecolorrgb44-62-80syncmap%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86font"><span class="toc-text"> sync.Map的底层原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="toc-text"> 关键设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E5%8F%8C-map-%E8%AE%BE%E8%AE%A1"><span class="toc-text"> 1. 双 map 设计</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E6%93%8D%E4%BD%9C"><span class="toc-text"> 一些操作</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1load"><span class="toc-text"> 1.load</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2store"><span class="toc-text"> 2.store</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#readmap-%E5%92%8C-dirtymap-%E7%9A%84%E5%85%B3%E8%81%94"><span class="toc-text"> readmap 和 dirtymap 的关联</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#syncmap%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text"> sync.Map的使用场景</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
@@ -149,7 +182,7 @@ a mod c = 2,b mod c = 3<br />
 
 <script type="text/javascript">
   window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
-  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/","checklink":"/js/plugins/video.js"};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/04/19/sync.map/","checklink":"/js/plugins/video.js"};
   // Fix: Ensure page is at the correct top position on data load
   if (history.scrollRestoration) {
     history.scrollRestoration = 'auto';
