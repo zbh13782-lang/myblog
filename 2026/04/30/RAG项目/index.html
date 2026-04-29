@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
   
-  <meta name="robots" content="noindex,follow">
+  
   <meta name="generator" content="Hexo 8.1.1">
   <meta http-equiv='x-dns-prefetch-control' content='on' />
   
@@ -17,22 +17,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>Category: Agent - zbh Blog</title>
+  <title>RAG项目相关问题 - zbh Blog</title>
 
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="zbh Blog">
-<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/categories/Agent/">
+    <meta name="description" content="离线阶段  1.数据准备和处理 准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字 其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是Apache Tika 紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本 有了纯文本，开始分块，不同">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RAG项目相关问题">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/">
 <meta property="og:site_name" content="zbh Blog">
+<meta property="og:description" content="离线阶段  1.数据准备和处理 准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字 其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是Apache Tika 紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本 有了纯文本，开始分块，不同">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
+<meta property="article:published_time" content="2026-04-29T17:05:05.677Z">
+<meta property="article:modified_time" content="2026-04-29T17:10:00.956Z">
 <meta property="article:author" content="zbh">
+<meta property="article:tag" content="Agent">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
   
   
   
-  
+  <meta name="keywords" content="Agent">
 
   <!-- feed -->
   
@@ -44,10 +49,10 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Website","@id":"https://zbh13782-lang.github.io/myblog","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"name":"zbh Blog","description":"","url":"https://zbh13782-lang.github.io/myblog"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-04-30T01:05:05+08:00","dateModified":"2026-04-30T01:10:00+08:00","datePublished":"2026-04-30T01:05:05+08:00","description":"","headline":"RAG项目相关问题","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/","keywords":"Agent","thumbnailUrl":null,"image":[]}</script>
   
 </head>
-<body><div id="l_cover"></div><div class="l_body index" id="start" layout="undefined" type="undefined" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+<body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
 
 
 <header class="header"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
@@ -59,26 +64,341 @@
 <div class="widgets">
 <div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
 
-<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/04/07/1.chunk/"><span class="title">1.chunk</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a><a class="item title" href="/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/"><span class="title">多cpu的调度</span></a></div></widget>
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a><a class="item title" href="/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/"><span class="title">多cpu的调度</span></a></div></widget>
 </div>
 
 </div></aside><div class="l_main" id="main">
 
-<header class="header mobile-only"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
-
- 
 
 
 
 
-<div class="navbar top"><div class="navbar-blur"><div class="navbar-container"><nav class="post"><a href="/myblog/">Recent</a><a class="active" href="/myblog/categories/">Category: Agent</a><a href="/myblog/archives/">Archives</a></nav></div></div></div>
-<div class="post-list post"><div class="post-card-wrap"><a class="post-card post" href="/myblog/2026/04/07/1.chunk/">
-<article class="md-text"><h2 class="post-title">1.chunk</h2><div class="excerpt"><p>path : AykAI/src/data/chunking
-目前完成：md分块，txt，无图的pdf（单纯txt。。
- 主要函数功能
- 1.检查格式
-1234567891011def _detect_chunk_mode(source: str, ...</p></div><div class="meta cap"><span class="cap" id="post-meta"><svg style="margin-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M6.94 2c.416 0 .753.324.753.724v1.46c.668-.012 1.417-.012 2.26-.012h4.015c.842 0 1.591 0 2.259.013v-1.46c0-.4.337-.725.753-.725s.753.324.753.724V4.25c1.445.111 2.394.384 3.09 1.055c.698.67.982 1.582 1.097 2.972L22 9H2v-.724c.116-1.39.4-2.302 1.097-2.972c.697-.67 1.645-.944 3.09-1.055V2.724c0-.4.337-.724.753-.724"/><path fill="currentColor" d="M22 14v-2c0-.839-.004-2.335-.017-3H2.01c-.013.665-.01 2.161-.01 3v2c0 3.771 0 5.657 1.172 6.828C4.343 22 6.228 22 10 22h4c3.77 0 5.656 0 6.828-1.172C22 19.658 22 17.772 22 14" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></svg><time datetime="2026-04-07T07:00:00.000Z">2026-04-07</time></span><span class="cap breadcrumb"><svg style="margin-bottom:1px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M2 6.95c0-.883 0-1.324.07-1.692A4 4 0 0 1 5.257 2.07C5.626 2 6.068 2 6.95 2c.386 0 .58 0 .766.017a4 4 0 0 1 2.18.904c.144.119.28.255.554.529L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .848.352C14.098 6 14.675 6 15.828 6h.374c2.632 0 3.949 0 4.804.77c.079.07.154.145.224.224c.77.855.77 2.172.77 4.804V14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14z" opacity=".5"/><path fill="currentColor" d="M20 6.238c0-.298-.005-.475-.025-.63a3 3 0 0 0-2.583-2.582C17.197 3 16.965 3 16.5 3H9.988c.116.104.247.234.462.45L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .849.352C14.098 6 14.675 6 15.829 6h.373c1.78 0 2.957 0 3.798.238"/><path fill="currentColor" fill-rule="evenodd" d="M12.25 10a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg><span>Agent</span></span></div></article>
-</a></div></div>
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/hello/">hello</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-04-29T17:05:05.677Z">2026-04-30</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-04-29T17:10:00.956Z">2026-04-30</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>RAG项目相关问题</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><img src="https://cdn.nlark.com/yuque/0/2026/png/64698420/1777463037441-79447753-edfd-4826-9190-bcb3acd97d25.png" width="1402" title="" crop="0,0,1,1" id="u21169f2f" class="ne-image">
+<h2 id="离线阶段"><a class="markdownIt-Anchor" href="#离线阶段"></a> 离线阶段</h2>
+<h3 id="1数据准备和处理"><a class="markdownIt-Anchor" href="#1数据准备和处理"></a> 1.数据准备和处理</h3>
+<p>准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字</p>
+<p>其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是<a href="about:blank">Apache Tika</a></p>
+<p>紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本</p>
+<p>有了纯文本，开始分块，不同类型文件有不同分块策略</p>
+<p>以下我就着我自己的项目来说，适合面试拷打项目。。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/zbh13782-lang/AykAI">https://github.com/zbh13782-lang/AykAI</a></p>
+<p>先丢一个表格</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>文档类型</strong></th>
+<th style="text-align:left"><strong>推荐策略</strong></th>
+<th style="text-align:left"><strong>理由</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">产品手册 / 知识库</td>
+<td style="text-align:left">递归分块</td>
+<td style="text-align:left">有清晰的章节、段落结构，递归策略能很好地利用这些结构</td>
+</tr>
+<tr>
+<td style="text-align:left">FAQ / 问答对</td>
+<td style="text-align:left">递归分块</td>
+<td style="text-align:left">每个 Q&amp;A 是一个自然单元，不应该被拆开</td>
+</tr>
+<tr>
+<td style="text-align:left">合同 / 法律文档</td>
+<td style="text-align:left">语义分块</td>
+<td style="text-align:left">条款之间的边界需要精确识别，规则分块容易切错</td>
+</tr>
+<tr>
+<td style="text-align:left">日志文件</td>
+<td style="text-align:left">固定大小分块或按行切割</td>
+<td style="text-align:left">日志通常每行一条记录，结构简单</td>
+</tr>
+<tr>
+<td style="text-align:left">代码文件</td>
+<td style="text-align:left">专用的代码分块器（按函数/类切）</td>
+<td style="text-align:left">通用的文本分块策略不适合代码，需要理解代码结构</td>
+</tr>
+<tr>
+<td style="text-align:left">HTML 页面</td>
+<td style="text-align:left">先清洗 HTML 标签，再用递归分块</td>
+<td style="text-align:left">HTML 标签会干扰分块，需要先处理</td>
+</tr>
+<tr>
+<td style="text-align:left">格式混乱的文本（OCR 等）</td>
+<td style="text-align:left">重叠分块</td>
+<td style="text-align:left">没有可靠的分隔符可用，重叠至少能缓解边界断裂</td>
+</tr>
+<tr>
+<td style="text-align:left">多类型混合的企业知识库</td>
+<td style="text-align:left">混合分块</td>
+<td style="text-align:left">不同类型的文档用不同策略，效果最好</td>
+</tr>
+</tbody>
+</table>
+<h4 id="markdown"><a class="markdownIt-Anchor" href="#markdown"></a> Markdown</h4>
+<p>这里面我用到的是父子索引设计</p>
+<ul>
+<li><strong><font style="color:rgb(31, 35, 40);">parent chunk（大块）存入postgre</font></strong>
+<ul>
+<li><font style="color:rgb(31, 35, 40);">更接近“完整语义段”</font></li>
+<li><font style="color:rgb(31, 35, 40);">用于后续回填给 LLM</font></li>
+</ul>
+</li>
+<li><strong><font style="color:rgb(31, 35, 40);">child chunk（小块）同时存入milvus和es</font></strong>
+<ul>
+<li><font style="color:rgb(31, 35, 40);">更适合向量检索和关键词检索</font></li>
+<li><font style="color:rgb(31, 35, 40);">用于召回命中</font></li>
+</ul>
+</li>
+</ul>
+<p>首先大块按照H1，H2分出来，再去递归分</p>
+<p>之后切小块（语义分块），这里面很有讲究，小块要完整保留到代码块，除非是代码块很大就可以按照</p>
+<details class="lake-collapse"><summary id="u06595cbe"><span class="ne-text" style="font-size: 14px">代码块切粉策略</span></summary><p id="u2ec82795" class="ne-p"><span class="ne-text">类 class</span></p><p id="u65738f14" class="ne-p"><span class="ne-text">函数 function</span></p></details>
+不过应该没人这么做。
+<p>小块还有表格类型，正常段落类型等等</p>
+<p>同时要注意保留好元数据，特别是parent_id</p>
+<h4 id="pdf"><a class="markdownIt-Anchor" href="#pdf"></a> PDF</h4>
+<p>这里其实就覆盖了ppt，word了，因为ppt和word都可以转化成PDF，也是比较重要的一个点</p>
+<p>通常对于pdf就直接采取重叠切分了。不过一定要注意<strong>数据清洗</strong></p>
+<hr />
+<h3 id="2向量化"><a class="markdownIt-Anchor" href="#2向量化"></a> <strong>2.向量化</strong></h3>
+<p>使用bge-m3</p>
+<h3 id="3数据库构建"><a class="markdownIt-Anchor" href="#3数据库构建"></a> 3.数据库构建</h3>
+<p>大块入postgre，小块分别入milvus和es，构建好索引</p>
+<p>向量维度通常1536（几乎没必要），512，768，1024，具体看embed模型</p>
+<p>注意：一个collection只用一个维度</p>
+<p>milvus用到了HNSW，</p>
+<p><font style="color:rgb(28, 30, 33);">HNSW 的核心结构是一个多层图：</font></p>
+<ul>
+<li><font style="color:rgb(28, 30, 33);">最底层（Layer 0）包含所有向量，每个向量和它附近的若干个向量相连</font></li>
+<li><font style="color:rgb(28, 30, 33);">往上每一层的向量数量越来越少（随机抽取），但连接的跨度越来越大</font></li>
+<li><font style="color:rgb(28, 30, 33);">最顶层只有很少的几个向量，但它们之间的连接覆盖了整个向量空间</font></li>
+</ul>
+<p><font style="color:rgb(28, 30, 33);">检索的时候，从最顶层开始，快速定位到目标的大致区域，然后逐层下降，每一层都在更精细的范围内搜索，最终在最底层找到最相似的向量。</font></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>索引类型</strong></th>
+<th style="text-align:left"><strong>核心思想</strong></th>
+<th style="text-align:left"><strong>检索速度</strong></th>
+<th style="text-align:left"><strong>召回率</strong></th>
+<th style="text-align:left"><strong>内存占用</strong></th>
+<th style="text-align:left"><strong>适用数据量</strong></th>
+<th style="text-align:left"><strong>适用场景</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">FLAT</td>
+<td style="text-align:left">暴力搜索，不建索引</td>
+<td style="text-align:left">最慢</td>
+<td style="text-align:left">100%（精确）</td>
+<td style="text-align:left">低（只存原始向量）</td>
+<td style="text-align:left">&lt; 10 万</td>
+<td style="text-align:left">对精度要求极高，数据量小</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_FLAT</td>
+<td style="text-align:left">聚类分区 + 簇内精确搜索</td>
+<td style="text-align:left">快</td>
+<td style="text-align:left">95%~99%</td>
+<td style="text-align:left">较低</td>
+<td style="text-align:left">百万~千万</td>
+<td style="text-align:left">数据量大，内存有限</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_SQ8</td>
+<td style="text-align:left">聚类分区 + 标量量化压缩</td>
+<td style="text-align:left">快</td>
+<td style="text-align:left">93%~97%</td>
+<td style="text-align:left">低（向量压缩为 1/4）</td>
+<td style="text-align:left">千万~亿级</td>
+<td style="text-align:left">数据量很大，愿意牺牲一点精度换内存</td>
+</tr>
+<tr>
+<td style="text-align:left">HNSW</td>
+<td style="text-align:left">多层图结构</td>
+<td style="text-align:left">最快</td>
+<td style="text-align:left">97%~99.5%</td>
+<td style="text-align:left">高（需存图结构）</td>
+<td style="text-align:left">百万~千万</td>
+<td style="text-align:left">对速度和精度都有要求，内存充足</td>
+</tr>
+<tr>
+<td style="text-align:left">DISKANN</td>
+<td style="text-align:left">基于磁盘的图索引</td>
+<td style="text-align:left">较快</td>
+<td style="text-align:left">95%~98%</td>
+<td style="text-align:left">低（索引在磁盘）</td>
+<td style="text-align:left">亿级</td>
+<td style="text-align:left">数据量极大，内存不够放 HNSW</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><font style="color:rgb(28, 30, 33);">数据量 &lt; 10 万，直接用 FLAT，暴力搜索就够了</font></li>
+<li><font style="color:rgb(28, 30, 33);">数据量 10 万~500 万，内存充足 → HNSW；内存有限 → IVF_FLAT</font></li>
+<li><font style="color:rgb(28, 30, 33);">数据量 500 万~5000 万，HNSW 如果内存放得下就用 HNSW，放不下用 IVF_SQ8</font></li>
+<li><font style="color:rgb(28, 30, 33);">数据量 &gt; 5000 万，考虑 DISKANN 或 IVF_PQ</font></li>
+</ul>
+<p>es存小块，采用IK分词器。</p>
+<h2 id="在线阶段"><a class="markdownIt-Anchor" href="#在线阶段"></a> 在线阶段</h2>
+<h3 id="1query重写"><a class="markdownIt-Anchor" href="#1query重写"></a> 1.query重写</h3>
+<p>调用一个<strong>子agent</strong>重写，因为这个agent需要知道上下文记忆。重写出来3-5个问题</p>
+<p>第一是直接改写，让 LLM 把口语化的问题转成更精准的表述；第二是 Query 扩展，补充相关关键词；第三是 HyDE，让 LLM 先生成一个假设答案，然后用答案的向量去检索；第四是 Step-back Prompting，把具体问题往上抽象一层，检索更通用的背景知识。</p>
+<p>本质还是上下文工程了</p>
+<p>后面带着改好的内容</p>
+<h3 id="2多路检索"><a class="markdownIt-Anchor" href="#2多路检索"></a> 2.多路检索</h3>
+<p>向量检索了k个，es检索了m个，采用RRF混合。</p>
+<ul>
+<li><strong>向量检索结果列表 A</strong>：包含 k 个小块文档，按余弦相似度降序排列。</li>
+<li><strong>ES 检索结果列表 B</strong>：包含 m 个小块文档，按 BM25 分数降序排列。</li>
+</ul>
+<p><code>**RRF_score(d) = Σ 1 / (k_constant + rank_i(d))**</code><strong>混合后去重</strong></p>
+<p>之后进行重排序，这里又需要调用Cross-Encoder模型了，最终得到top-k个最终结果，根据parent_id去pg得到父块</p>
+<h3 id="3装填上下文并回答"><a class="markdownIt-Anchor" href="#3装填上下文并回答"></a> 3.装填上下文并回答</h3>
+<h2 id="q-a"><a class="markdownIt-Anchor" href="#q-a"></a> Q &amp; A</h2>
+<h3 id="1租户隔离问题"><a class="markdownIt-Anchor" href="#1租户隔离问题"></a> 1.租户隔离问题</h3>
+<p>不同部门，用户查询到不同信息，这个怎么做？</p>
+<p>1.所有chunk带着tenant_id，检索的时候添加过滤条件</p>
+<p>2.可以不同部门分不同的collection，partition，但部门种类多了，分区也多了</p>
+<p>3.权限上隔离：用户登陆之后，服务端鉴权，从JWT中解析出来了tenant_id,注入检索的过滤条件</p>
+<p>登录成功后，认证服务签发 JWT：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;sub&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user_123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tenant_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;tenant_a&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;roles&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;admin&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;permissions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;rag:read&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exp&quot;</span><span class="punctuation">:</span> <span class="number">1730000000</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>后端强制校验bind到tenant_id</p>
+<p>4.召回时再次较验chunk的tenantid，只把合法的放入上下文</p>
+<h3 id="2新旧文档问题怎么动态更新"><a class="markdownIt-Anchor" href="#2新旧文档问题怎么动态更新"></a> 2.新旧文档问题（怎么动态更新）</h3>
+<h4 id="常用思路"><a class="markdownIt-Anchor" href="#常用思路"></a> 常用思路</h4>
+<h5 id="增量更新"><a class="markdownIt-Anchor" href="#增量更新"></a> 增量更新</h5>
+<p>直接在原来文档的基础上做增量更新，这样是最理想的。</p>
+<h5 id="修改原来x"><a class="markdownIt-Anchor" href="#修改原来x"></a> 修改原来（X）</h5>
+<p>只修改了某个句子，那就只改那个句子对应的chunk，这样看起来没问题，但实际上要考虑的问题也多了，比如一个句子同时对应两个chunk呢，这实际上是一个错误的方法</p>
+<h5 id="重新加载"><a class="markdownIt-Anchor" href="#重新加载"></a> 重新加载</h5>
+<p>删掉对应文件，重新入库，对待修改的文档，只能采取这种方式</p>
+<h4 id="如何知道文档内容变化"><a class="markdownIt-Anchor" href="#如何知道文档内容变化"></a> 如何知道文档内容变化</h4>
+<p>内容hash，计算文档内容的MD5或者SHA256摘要，把hash，chunk-id，文档id存入数据库，下次查到这个文章时，重新计算hash值对比数据库的值。</p>
+<p>缺点：每次都算hash，性能开销大</p>
+<p>解决方法：用<strong>最后修改时间</strong>这个字段粗筛，变化的文章才算hash</p>
+<h3 id="3优化策略"><a class="markdownIt-Anchor" href="#3优化策略"></a> 3.优化策略</h3>
+<h4 id="批处理"><a class="markdownIt-Anchor" href="#批处理"></a> 批处理</h4>
+<details class="lake-collapse"><summary id="u44d01461"><strong><span class="ne-text" style="font-size: 16px">批处理流程</span></strong></summary><p id="u65c513f2" class="ne-p"><span class="ne-text">多文件上传</span></p><p id="u983e09c2" class="ne-p"><span class="ne-text"> ↓</span></p><p id="ub61433ec" class="ne-p"><span class="ne-text">异步解析</span></p><p id="u08bbe9f5" class="ne-p"><span class="ne-text"> ↓</span></p><p id="u7f044cd3" class="ne-p"><span class="ne-text">清洗分块</span></p><p id="u2b088a4d" class="ne-p"><span class="ne-text"> ↓</span></p><p id="uba7a4b40" class="ne-p"><span class="ne-text">批量向量化</span></p><p id="u4a10e8cc" class="ne-p"><span class="ne-text"> ↓</span></p><p id="ub269285d" class="ne-p"><span class="ne-text">批量写入向量库</span></p><p id="u30925fd2" class="ne-p"><span class="ne-text"> ↓</span></p><p id="ud4eccf36" class="ne-p"><span class="ne-text">状态可追踪、可重试、可增量更新</span></p></details>
+注意在过程中保留好chunk_id这些元数据，随后embeding时候可以：
+<ul>
+<li><strong>批量 Embedding</strong>：调用 Embedding 模型时，尽量使用批量处理接口（例如 <code>embedding.embed_documents()</code>），将多个文本块一次性传入。相比单条处理，批量处理的速度通常能提升 3-5 倍。</li>
+<li><strong>多线程/并发处理</strong>：在处理大量文件时，可以利用多线程或异步并发机制进行批量向量化，进一步榨干硬件性能，缩短整体入库时间。</li>
+</ul>
+<h3 id="4你遇到最大的困难是什么"><a class="markdownIt-Anchor" href="#4你遇到最大的困难是什么"></a> 4.你遇到最大的困难是什么</h3>
+<p>文档清洗，chunk切分问题，效果评估的黑盒问题</p>
+<h3 id="5怎么评估你的rag效果"><a class="markdownIt-Anchor" href="#5怎么评估你的rag效果"></a> 5.怎么评估你的RAG效果</h3>
+<p>具体可以看<a target="_blank" rel="noopener" href="https://xiaolinnote.com/ai/rag/18_evaluation.html#%E4%BB%80%E4%B9%88%E6%98%AF-rag-%E8%AF%84%E4%BC%B0">小林的这个文章</a></p>
+<p>分三个方面看</p>
+<h4 id="1检索层"><a class="markdownIt-Anchor" href="#1检索层"></a> 1.检索层</h4>
+<p>recall@k：在top-k个结果里面是否有正确答案，比如recall@5 = 1表示命中了</p>
+<p>hit rate：是否命中过</p>
+<p>MRR：正确答案排在第几？越靠前越好</p>
+<p>比如</p>
+<p>排第1 → 1.0</p>
+<p>排第2 → 0.5</p>
+<p>排第5 → 0.2</p>
+<p>评估流程：</p>
+<p>先做一个评估数据集：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="string">&quot;宫保鸡丁怎么做&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;gold_doc_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;doc_123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;gold_chunk_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;chunk_456&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>看是否命中gold chunk，计算recall@k，如果 &lt; 0.7说明rag设计的基本不可用</p>
+<h4 id="2生成层"><a class="markdownIt-Anchor" href="#2生成层"></a> 2.生成层</h4>
+<p>主要借助RAGas</p>
+<p>指标：</p>
+<p><strong>Faithfulness（忠实性）：回答是否基于检索内容</strong></p>
+<p><strong>Correctness（正确性）：回答是否正确</strong></p>
+<p><strong>Relevance（相关性）：是否回答了问题</strong></p>
+<p><strong>方法1：人工评估（最准）</strong></p>
+<p><strong>方法2：LLM as a judge</strong></p>
+<h3 id="6rag和微调的区别"><a class="markdownIt-Anchor" href="#6rag和微调的区别"></a> 6.RAG和微调的区别</h3>
+<p>这里就涉及到fine tuning了，以后我会单独讲一遍</p>
+<p>微调实际上是修改了模型参数，让模型学习专业的东西，更定制化，但代价很高，特别是出现新旧文档问题的时候更加明显</p>
+<p>RAG是在模型回答的时候把文档塞到prompt，类似开卷考试，但这个过程的缺点也明显：延迟高</p>
+<table>
+<thead>
+<tr>
+<th><strong>场景</strong></th>
+<th><strong>用 RAG</strong></th>
+<th><strong>用微调</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文档问答</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>知识库更新频繁</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>私有数据</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>固定格式输出</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>风格控制</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>推理能力增强</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>代码风格统一</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>事实性知识</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+</article>
+<div class="article-footer">
+    <section id="license">
+      <div class="header"><span>License</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    
+
+</div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/04/19/sync.map/">sync.map</a></div></section></div>
+
+
+
+
 
 
 <footer class="page-footer footnote"><hr><div class="text"><p>📍 中国 · 上海 | 📧 zbh13782@gmail.com</p>
@@ -86,7 +406,12 @@
 本博客由 zbh 使用 [Stellar 主题创建。
 本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
 </div></footer>
-<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right"></aside><div class='float-panel'>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right"><div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5"><span class="toc-text"> 离线阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87%E5%92%8C%E5%A4%84%E7%90%86"><span class="toc-text"> 1.数据准备和处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#markdown"><span class="toc-text"> Markdown</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pdf"><span class="toc-text"> PDF</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E5%90%91%E9%87%8F%E5%8C%96"><span class="toc-text"> 2.向量化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9E%84%E5%BB%BA"><span class="toc-text"> 3.数据库构建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E9%98%B6%E6%AE%B5"><span class="toc-text"> 在线阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1query%E9%87%8D%E5%86%99"><span class="toc-text"> 1.query重写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E5%A4%9A%E8%B7%AF%E6%A3%80%E7%B4%A2"><span class="toc-text"> 2.多路检索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E8%A3%85%E5%A1%AB%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B9%B6%E5%9B%9E%E7%AD%94"><span class="toc-text"> 3.装填上下文并回答</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#q-a"><span class="toc-text"> Q &amp; A</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E7%A7%9F%E6%88%B7%E9%9A%94%E7%A6%BB%E9%97%AE%E9%A2%98"><span class="toc-text"> 1.租户隔离问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E6%96%B0%E6%97%A7%E6%96%87%E6%A1%A3%E9%97%AE%E9%A2%98%E6%80%8E%E4%B9%88%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0"><span class="toc-text"> 2.新旧文档问题（怎么动态更新）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%80%9D%E8%B7%AF"><span class="toc-text"> 常用思路</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0"><span class="toc-text"> 增量更新</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%9D%A5x"><span class="toc-text"> 修改原来（X）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD"><span class="toc-text"> 重新加载</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%9F%A5%E9%81%93%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%8F%98%E5%8C%96"><span class="toc-text"> 如何知道文档内容变化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-text"> 3.优化策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86"><span class="toc-text"> 批处理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E4%BD%A0%E9%81%87%E5%88%B0%E6%9C%80%E5%A4%A7%E7%9A%84%E5%9B%B0%E9%9A%BE%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text"> 4.你遇到最大的困难是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E6%80%8E%E4%B9%88%E8%AF%84%E4%BC%B0%E4%BD%A0%E7%9A%84rag%E6%95%88%E6%9E%9C"><span class="toc-text"> 5.怎么评估你的RAG效果</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E6%A3%80%E7%B4%A2%E5%B1%82"><span class="toc-text"> 1.检索层</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E7%94%9F%E6%88%90%E5%B1%82"><span class="toc-text"> 2.生成层</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6rag%E5%92%8C%E5%BE%AE%E8%B0%83%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text"> 6.RAG和微调的区别</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+</div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
   </button>
@@ -99,7 +424,7 @@
 
 <script type="text/javascript">
   window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
-  window.canonical["param"] = {"permalink":null,"checklink":"/js/plugins/video.js"};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/","checklink":"/js/plugins/video.js"};
   // Fix: Ensure page is at the correct top position on data load
   if (history.scrollRestoration) {
     history.scrollRestoration = 'auto';
