@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
   
-  <meta name="robots" content="noindex,follow">
+  
   <meta name="generator" content="Hexo 8.1.1">
   <meta http-equiv='x-dns-prefetch-control' content='on' />
   
@@ -17,15 +17,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>Tags - zbh Blog</title>
+  <title>Agent的一些概念和一些碎碎念 - zbh Blog</title>
 
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Tags">
-<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/tags/">
+    <meta name="description" content="写这些的初衷仅为了个人学习，准备八股。  Function Calling和MCP  前情提要 二者解决的都是模型要掉用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题  另外OpenAI的这个文章关于FC写的蛮好的 langchain的tool都是用了 **@tool **这个装饰器来封装的 LangChain 会自动把 @tool">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent的一些概念和一些碎碎念">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/">
 <meta property="og:site_name" content="zbh Blog">
+<meta property="og:description" content="写这些的初衷仅为了个人学习，准备八股。  Function Calling和MCP  前情提要 二者解决的都是模型要掉用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题  另外OpenAI的这个文章关于FC写的蛮好的 langchain的tool都是用了 **@tool **这个装饰器来封装的 LangChain 会自动把 @tool">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
+<meta property="article:published_time" content="2026-04-30T18:34:23.402Z">
+<meta property="article:modified_time" content="2026-04-30T18:35:46.981Z">
 <meta property="article:author" content="zbh">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
@@ -44,10 +48,10 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Website","@id":"https://zbh13782-lang.github.io/myblog","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"name":"zbh Blog","description":"","url":"https://zbh13782-lang.github.io/myblog"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-05-01T02:34:23+08:00","dateModified":"2026-05-01T02:35:46+08:00","datePublished":"2026-05-01T02:34:23+08:00","description":"","headline":"Agent的一些概念和一些碎碎念","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","thumbnailUrl":null,"image":[]}</script>
   
 </head>
-<body><div id="l_cover"></div><div class="l_body index" id="start" layout="tags" type="undefined" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+<body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
 
 
 <header class="header"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
@@ -59,28 +63,138 @@
 <div class="widgets">
 <div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
 
-<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a><a class="item title" href="/myblog/2026/03/26/%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/"><span class="title">多cpu的调度</span></a></div></widget>
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"><span class="title">Agent的一些概念和一些碎碎念</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a></div></widget>
 </div>
 
 </div></aside><div class="l_main" id="main">
 
-<header class="header mobile-only"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
 
 
-  
-  
-  
 
-<div class="navbar top"><div class="navbar-blur"><div class="navbar-container"><nav class="post"><a href="/myblog/">Recent</a><a href="/myblog/categories/">Categories</a><a class="active" href="/myblog/tags/">Tags</a><a href="/myblog/archives/">Archives</a></nav></div></div></div>
-  <div class='post-list'>
-    <article class='' id='tags'>
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/Agent/">Agent</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-04-30T18:34:23.402Z">2026-05-01</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-04-30T18:35:46.981Z">2026-05-01</time></span></div></div></div>
+    
+    <div class="bottom only-title">
       
-        <a class='tag' href="/myblog/tags/Agent/">
-          <span class='name'>Agent</span>
-        </a>
-      
-    </article>
+      <div class="text-area">
+        <h1 class="text title"><span>Agent的一些概念和一些碎碎念</span></h1>
+        
+      </div>
+    </div>
+    
   </div>
+  </div><article class="md-text content"><p>写这些的初衷仅为了个人学习，准备八股。</p>
+<h2 id="function-calling和mcp"><a class="markdownIt-Anchor" href="#function-calling和mcp"></a> Function Calling和MCP</h2>
+<h3 id="前情提要"><a class="markdownIt-Anchor" href="#前情提要"></a> 前情提要</h3>
+<p>二者解决的都是模型要掉用<strong>工具</strong>的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题</p>
+<img src="https://cdn.nlark.com/yuque/0/2026/png/64698420/1777535910403-c0055f09-e8c1-46d3-98d3-48f68eb8b9f1.png" width="701" title="" crop="0,0,1,1" id="ue238de87" class="ne-image">
+<p>另外<a href="about:blank">OpenAI的这个文章</a>关于FC写的蛮好的</p>
+<p>langchain的tool都是用了 **@tool **这个装饰器来封装的</p>
+<p>LangChain 会自动把 @tool 装饰的函数 → 转换成 JSON Schema 发给 OpenAI</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"><span class="meta">@tool(<span class="params"><span class="string">&quot;run_bash&quot;</span></span>) </span><span class="comment">#name</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止执行任何高危系统命令。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 你要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment">#上面是description和parameters</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 超时 100 秒，防止卡死</span></span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ bash工具执行超时（超过100秒），已终止&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 执行失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>转换一下就是OpenAI要求的格式</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;run_bash&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;执行安全的 bash 命令，禁止执行任何高危系统命令。只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。\n\n    Args:\n        command: 你要执行的 bash 命令&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;你要执行的 bash 命令&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;command&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>要是用langchain的fastmcp，那就写成下面这样，这样的话，这个工具就可以换框架，换语言使用了，因为这样就统一了要求的Json Schema格式了</p>
+<p>封装成 MCP 后，它不再只是一个 Python 函数，变成了**<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">可共享、可远程、可跨框架的标准 AI 工具</font>**。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mcp.server.fastmcp <span class="keyword">import</span> FastMCP</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">mcp = FastMCP(<span class="string">&quot;bash_tool&quot;</span>)  <span class="comment"># 服务名</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@mcp.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止高危操作。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ 超时（100秒）&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    mcp.run()  <span class="comment"># 默认用 stdio 启动</span></span><br></pre></td></tr></table></figure>
+<p>另外，MCP Client就可以完成Agent要用的tools的封装</p>
+<p>另外说一下传输协议的问题吧</p>
+<h3 id="传输协议"><a class="markdownIt-Anchor" href="#传输协议"></a> 传输协议</h3>
+<h4 id="本地mcp-tool"><a class="markdownIt-Anchor" href="#本地mcp-tool"></a> 本地MCP tool</h4>
+<p>本地就是用stdio，这是一种<strong>进程间管道通信协议（操作系统讲的）</strong></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端（LangChain MCP Adapter）把 MCP Server 当成子进程启动</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端 → 子进程：写 stdin</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">子进程 → 客户端：写 stdout</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">消息格式：每行一个 JSON‑RPC 2.0 消息</font></li>
+</ul>
+<h4 id="外部mcp-tool"><a class="markdownIt-Anchor" href="#外部mcp-tool"></a> 外部MCP tool</h4>
+<p>比如GitHub MCP Server，也是我<a href="about:blank">项目</a>里用到的那个，遵守的是 Streamable HTTP  协议，</p>
+<p>以前是http + sse，这是属于<strong>计算机网络</strong>知识。我会在网络部分的八股和Agent八股里面详细说的</p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">旧版：</font><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">HTTP + SSE（Server‑Sent Events）</font></strong></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端发 HTTP POST → 服务端</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">服务端用 SSE 长连接推数据 → 客户端（单向流）</font></li>
+</ul>
+<p>通常是两个端点：</p>
+<p>/sse       用 GET 打开 SSE 长连接，服务端通过它推消息</p>
+<p>/messages  用 POST 发送客户端到服务端的 JSON-RPC 消息</p>
+<details class="lake-collapse"><summary id="u127396b1"><span class="ne-text">举个栗子</span></summary><ol class="ne-ol"><li id="u8a42fcee" data-lake-index-type="0"><span class="ne-text">客户端 GET /sse</span></li><li id="u744d2f6f" data-lake-index-type="0"><span class="ne-text">服务端保持这个 SSE 连接不关闭</span></li><li id="u13e041f2" data-lake-index-type="0"><span class="ne-text">服务端通过 SSE 发一个 endpoint 事件，告诉客户端 POST 地址</span></li><li id="u22fe9b71" data-lake-index-type="0"><span class="ne-text">客户端 POST /messages 发送 initialize、tools/call 等 JSON-RPC 消息</span></li><li id="u229597a8" data-lake-index-type="0"><span class="ne-text">服务端如果要回消息、推通知、发进度，就通过之前那条 SSE 长连接推给客户端</span></li></ol></details>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">新版：</font><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">Streamable HTTP</font></strong></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">一个统一 HTTP 端点，同时支持：</font>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">POST：客户端 → 服务端（请求）</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">GET+SSE：服务端 → 客户端（响应 / 流式推送）</font></li>
+</ul>
+</li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">双向流、支持会话、多客户端、可重连</font><strong><font style="color:rgba(0, 0, 0, 0.5);background-color:rgba(0, 0, 0, 0.04);">Model Context Protocol</font></strong></li>
+</ul>
+<p>通常有一个端点：/mcp</p>
+<details class="lake-collapse"><summary id="u20e90e14"><span class="ne-text" style="font-size: 16px">简单请求的例子</span></summary><ol class="ne-ol"><li id="uc7a43bfd" data-lake-index-type="0"><span class="ne-text">客户端 POST /mcp<br />body: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;tools/list&quot;}</span></li><li id="udc6f8896" data-lake-index-type="0"><span class="ne-text">服务端直接返回：<br />Content-Type: application/json{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;result&quot;:{...}}</span></li></ol></details>
+<details class="lake-collapse"><summary id="u3a7cf1b0"><span class="ne-text" style="font-size: 16px">流失请求的例子</span></summary><ol class="ne-ol"><li id="uf26a3f88" data-lake-index-type="0"><span class="ne-text">客户端 POST /mcp<br />body: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/call&quot;,...}</span></li><li id="u7e97f890" data-lake-index-type="0"><span class="ne-text">服务端返回：<br />Content-Type: text/event-streamevent: message<br />data: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;notifications/progress&quot;,...}event: message<br />data: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;result&quot;:{...}}</span></li></ol></details>
+这时 SSE 只是这次 POST 响应的流式返回形式，而不是必须提前建立的一条专用 `/sse` 通道。
+<p>二者的比较：原来是专门要先让客户端发送一个GET请求，之后服务端建立一个SSE管道来进行后续的服务端到客户端通信，这中间如果断连了，服务端无法及时感知到。</p>
+<p>原来的http+sse更适合长连接情况</p>
+<p>无论是本地还是外部，都遵循了JSON-RPC2.0格式，这也是MCP存在的一个必要吧，同意了一切的工具格式</p>
+<h2 id="skill"><a class="markdownIt-Anchor" href="#skill"></a> SKILL</h2>
+<p>书接上回，讲到了MCP，那就紧接着说说skill吧，首先二者不算是同一层的东西，更像是上下层，skill教会模型具体的任务说明书，这个任务需要用到工具的时候，MCP给了模型工具的使用说明书，skill更像是一种全局策略。</p>
+<h3 id="渐进式加载动态加载"><a class="markdownIt-Anchor" href="#渐进式加载动态加载"></a> 渐进式加载（动态加载）</h3>
+<p>这是skill设计的巧妙之处，这就解决了太长的skill塞入prompt的问题，只需要把skill的name和简短的description加载到system prompt，就能实现模型的skill，这里不得不感慨Anthropic的牛比之处了，虽然MCP和SKILL现在看起来是历史的必然趋势，但是人家提出来并发扬了确实吊。。</p>
+<h2 id="agent思维范式"><a class="markdownIt-Anchor" href="#agent思维范式"></a> Agent思维范式</h2>
+<h3 id="react"><a class="markdownIt-Anchor" href="#react"></a> React</h3>
+<p>最著名的莫过于React了，这可不是前端框架。。而是Reason+act，底层就是while True</p>
+<details class="lake-collapse"><summary id="u44735e30"><span class="ne-text">流程图</span></summary><p id="ud5bdde7b" class="ne-p"><span class="ne-text">用户目标</span></p><p id="u55bdfe04" class="ne-p"><span class="ne-text">↓</span></p><p id="u9a93a1f9" class="ne-p"><span class="ne-text">Agent 判断需要什么信息</span></p><p id="uaf6b2794" class="ne-p"><span class="ne-text">↓</span></p><p id="ua39f744d" class="ne-p"><span class="ne-text">调用工具</span></p><p id="u2d5fe46b" class="ne-p"><span class="ne-text">↓</span></p><p id="uea3f2961" class="ne-p"><span class="ne-text">观察工具返回</span></p><p id="ufb99c586" class="ne-p"><span class="ne-text">↓</span></p><p id="u3dcbde76" class="ne-p"><span class="ne-text">继续推理</span></p><p id="ubc9b6884" class="ne-p"><span class="ne-text">↓</span></p><p id="u55ae0485" class="ne-p"><span class="ne-text">再调用工具或输出答案</span></p></details>
+langchain其实自己封装的create_agent函数用到的就是这个范式。
+<h3 id="plan-and-execute"><a class="markdownIt-Anchor" href="#plan-and-execute"></a> <strong>Plan-and-Execute</strong></h3>
+<p>这个也顾名思义了，后面还有replan，也就是agent自己再次细分计划的过程</p>
+<details class="lake-collapse"><summary id="u841cc2b2"><span class="ne-text">流程图</span></summary><p id="u145865cd" class="ne-p"><span class="ne-text">目标</span></p><p id="uf4a648bb" class="ne-p"><span class="ne-text">  ↓</span></p><p id="ubec23988" class="ne-p"><span class="ne-text">拆解任务</span></p><p id="u74411d13" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u885c25bc" class="ne-p"><span class="ne-text">形成步骤计划</span></p><p id="uf2b32bd9" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u2a09d3c8" class="ne-p"><span class="ne-text">逐步执行</span></p><p id="u2c5cea4d" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u801a0422" class="ne-p"><span class="ne-text">汇总结果</span></p></details>
+### **Reflection**
+反思，顾名思义
+<details class="lake-collapse"><summary id="u6a811f6c"><span class="ne-text">流程图</span></summary><p id="uc34242a7" class="ne-p"><span class="ne-text">生成初稿</span></p><p id="ub941275c" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u16f34591" class="ne-p"><span class="ne-text">自我检查</span></p><p id="u07ffb4d0" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u47267740" class="ne-p"><span class="ne-text">发现问题</span></p><p id="ua1d4aa26" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u6414d97f" class="ne-p"><span class="ne-text">修改</span></p><p id="u59a31d5f" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u26687fed" class="ne-p"><span class="ne-text">再次检查</span></p></details>
+无论哪个吧，最最重要的我觉得还是Human in the Loop，一定要管理好agent的行为，也是Harness工程的核心。
+<h2 id="single-agent和multi-agent"><a class="markdownIt-Anchor" href="#single-agent和multi-agent"></a> Single-Agent和Multi-Agent</h2>
+<h3 id="single-agent"><a class="markdownIt-Anchor" href="#single-agent"></a> Single Agent</h3>
+<p>单Agent工作，优点是适合小工作，因为记忆有限的问题，在处理小问题的时候非常好用。</p>
+<p>缺点就是一个Agent要是干大工作要累死，还是因为上下文的问题。</p>
+<h3 id="multi-agent"><a class="markdownIt-Anchor" href="#multi-agent"></a> Multi Agent</h3>
+<h4 id="a2a"><a class="markdownIt-Anchor" href="#a2a"></a> A2A</h4>
+<p>Google推出的一个协议，解决多Agent之间的通信问题</p>
+<h4 id="分工问题"><a class="markdownIt-Anchor" href="#分工问题"></a> 分工问题</h4>
+<p>有了多Agent，就很好解决了单Agent的上下文问题了，比如某个任务需要很干净的上下文去做（搜索网页之类的），只需要子Agent把返回的结果和总结给到Leader，而不要关注你搜索到多少，搜索到多好。</p>
+<p>同时，加入我自己的一些理解，一定不要让Agent自主决定去开一个子Agent干，而是要加入人为干预，写入system prompt，什么任务可以开子Agent，什么任务可以交给别的Agent来干</p>
+<p>举个例子：</p>
+<p>1.父Agent传入了错误信息，那子Agent又不知道是错的，干脆一错到底。</p>
+<p>2.比如code过程</p>
+<p>Leader 设计方案，说设计没问题</p>
+<p>Coder 写代码，说按计划写的</p>
+<p>Tester 跑测试，说环境不完整</p>
+<p>Reviewer 提意见，说我只是审查</p>
+<p>最后活不还是全都交给Leader做了吗，阴阳一手大学小组分工</p>
+<h2 id="结尾"><a class="markdownIt-Anchor" href="#结尾"></a> 结尾</h2>
+<p>写完这篇文章我再自己看一下，感觉逻辑好像很混乱，但是我自己看懂就行了。。后面继续写一个项目相关的文章，主要针对面试，押一下面试问的问题，然后写关于数据库的八股和网络的八股吧，五一假期应该可以玩完。</p>
+</article>
+<div class="article-footer">
+    <section id="license">
+      <div class="header"><span>License</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    
+
+</div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/">RAG项目相关问题</a></div></section></div>
+
+
+
+
 
 
 <footer class="page-footer footnote"><hr><div class="text"><p>📍 中国 · 上海 | 📧 zbh13782@gmail.com</p>
@@ -88,7 +202,12 @@
 本博客由 zbh 使用 [Stellar 主题创建。
 本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
 </div></footer>
-<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right"></aside><div class='float-panel'>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right"><div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#function-calling%E5%92%8Cmcp"><span class="toc-text"> Function Calling和MCP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E6%83%85%E6%8F%90%E8%A6%81"><span class="toc-text"> 前情提要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE"><span class="toc-text"> 传输协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0mcp-tool"><span class="toc-text"> 本地MCP tool</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E9%83%A8mcp-tool"><span class="toc-text"> 外部MCP tool</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#skill"><span class="toc-text"> SKILL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%90%E8%BF%9B%E5%BC%8F%E5%8A%A0%E8%BD%BD%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD"><span class="toc-text"> 渐进式加载（动态加载）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#agent%E6%80%9D%E7%BB%B4%E8%8C%83%E5%BC%8F"><span class="toc-text"> Agent思维范式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#react"><span class="toc-text"> React</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#plan-and-execute"><span class="toc-text"> Plan-and-Execute</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#single-agent%E5%92%8Cmulti-agent"><span class="toc-text"> Single-Agent和Multi-Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#single-agent"><span class="toc-text"> Single Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#multi-agent"><span class="toc-text"> Multi Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#a2a"><span class="toc-text"> A2A</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%B7%A5%E9%97%AE%E9%A2%98"><span class="toc-text"> 分工问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E5%B0%BE"><span class="toc-text"> 结尾</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+</div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
   </button>
@@ -101,7 +220,7 @@
 
 <script type="text/javascript">
   window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
-  window.canonical["param"] = {"permalink":null,"checklink":"/js/plugins/video.js"};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","checklink":"/js/plugins/video.js"};
   // Fix: Ensure page is at the correct top position on data load
   if (history.scrollRestoration) {
     history.scrollRestoration = 'auto';
