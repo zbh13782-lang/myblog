@@ -1,0 +1,1326 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 8.1.1">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>Agent的一些概念和一些碎碎念 - zbh Blog</title>
+
+  
+    <meta name="description" content="写这些的初衷仅为了个人学习，准备八股，有些问题如果和你思考的不一样，欢迎提出你的思考～  Function Calling,Tool call,MCP  前情提要 二者解决的都是模型要调用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题。  另外OpenAI的这个文章关于FC写的蛮好的。 langchain的tool都是用了 @too">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent的一些概念和一些碎碎念">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/">
+<meta property="og:site_name" content="zbh Blog">
+<meta property="og:description" content="写这些的初衷仅为了个人学习，准备八股，有些问题如果和你思考的不一样，欢迎提出你的思考～  Function Calling,Tool call,MCP  前情提要 二者解决的都是模型要调用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题。  另外OpenAI的这个文章关于FC写的蛮好的。 langchain的tool都是用了 @too">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
+<meta property="article:published_time" content="2026-05-01T17:48:52.997Z">
+<meta property="article:modified_time" content="2026-05-01T17:53:07.124Z">
+<meta property="article:author" content="zbh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
+  
+  
+  
+  
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/myblog/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-05-02T01:48:52+08:00","dateModified":"2026-05-02T01:53:07+08:00","datePublished":"2026-05-02T01:48:52+08:00","description":"","headline":"Agent的一些概念和一些碎碎念","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","thumbnailUrl":null,"image":[]}</script>
+  
+</head>
+<body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/myblog/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/myblog/images/hp.png" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">zbh Blog</div><div class="sub normal cap">一个爱玩原神的大二本科生!</div><div class="sub hover cap" style="opacity:0">原神牛逼！</div></a></div></header>
+<div style="text-align: center; margin-top: 10px;"><a href="https://codetime.dev" target="_blank" rel="external nofollow noopener noreferrer"><img no-lazy style="display: block; margin: 0 auto;" src="https://shields.jannchie.com/endpoint?style=social&color=222&url=https%3A%2F%2Fapi.codetime.dev%2Fv3%2Fusers%2Fshield%3Fuid%3D35418" alt="CodeTime Badge" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a></div>
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/myblog/" style="color:#1BCDFC"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M20 12a8 8 0 1 1-16 0a8 8 0 0 1 16 0" opacity=".5"/><path fill="currentColor" d="M17.712 5.453c1.047-.193 2.006-.259 2.797-.152c.77.103 1.536.393 1.956 1.064c.446.714.312 1.542-.012 2.258c-.33.728-.918 1.499-1.672 2.268c-1.516 1.547-3.836 3.226-6.597 4.697c-2.763 1.472-5.495 2.484-7.694 2.92c-1.095.217-2.098.299-2.923.201c-.8-.095-1.6-.383-2.032-1.075c-.47-.752-.296-1.63.07-2.379c.375-.768 1.032-1.586 1.872-2.403L4 12.416c0 .219.083.71.168 1.146c.045.23.09.444.123.596c-.652.666-1.098 1.263-1.339 1.756c-.277.567-.208.825-.145.925c.072.116.305.305.937.38c.609.073 1.44.018 2.455-.183c2.02-.4 4.613-1.351 7.28-2.772c2.667-1.42 4.85-3.015 6.23-4.423c.694-.707 1.15-1.334 1.377-1.836c.233-.515.167-.75.107-.844c-.07-.112-.289-.294-.883-.374c-.542-.072-1.272-.041-2.163.112L16.87 5.656c.338-.101.658-.17.842-.203"/></svg></a><a class="nav-item" title="分类" href="/myblog/categories/" style="color:#3DC550"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M14.25 4.48v3.057c0 .111 0 .27.02.406a.936.936 0 0 0 .445.683a.96.96 0 0 0 .783.072c.13-.04.272-.108.378-.159L17 8.005l1.124.534c.106.05.248.119.378.16a.958.958 0 0 0 .783-.073a.936.936 0 0 0 .444-.683c.021-.136.021-.295.021-.406V3.031c.113-.005.224-.01.332-.013C21.154 2.98 22 3.86 22 4.933v11.21c0 1.112-.906 2.01-2.015 2.08c-.97.06-2.108.179-2.985.41c-1.082.286-1.99 1.068-3.373 1.436c-.626.167-1.324.257-1.627.323V5.174c.32-.079 1.382-.203 1.674-.371c.184-.107.377-.216.576-.323m5.478 8.338a.75.75 0 0 1-.546.91l-4 1a.75.75 0 0 1-.364-1.456l4-1a.75.75 0 0 1 .91.546" clip-rule="evenodd"/><path fill="currentColor" d="M18.25 3.151c-.62.073-1.23.18-1.75.336a8.2 8.2 0 0 0-.75.27v3.182l.75-.356l.008-.005a1.13 1.13 0 0 1 .492-.13c.047 0 .094.004.138.01c.175.029.315.1.354.12l.009.005l.749.356V3.647z"/><path fill="currentColor" d="M12 5.214c-.334-.064-1.057-.161-1.718-.339C8.938 4.515 8.05 3.765 7 3.487c-.887-.234-2.041-.352-3.018-.412C2.886 3.007 2 3.9 2 4.998v11.146c0 1.11.906 2.01 2.015 2.079c.97.06 2.108.179 2.985.41c.486.129 1.216.431 1.873.726c1.005.451 2.052.797 3.127 1.034z" opacity=".5"/><path fill="currentColor" d="M4.273 12.818a.75.75 0 0 1 .91-.545l4 1a.75.75 0 1 1-.365 1.455l-4-1a.75.75 0 0 1-.545-.91m.909-4.545a.75.75 0 1 0-.364 1.455l4 1a.75.75 0 0 0 .364-1.455z"/></svg></a><a class="nav-item" title="抖音" target="_blank" rel="noopener" href="https://www.douyin.com/user/MS4wLjABAAAA1v93zWNhRvNwG1FXU-WISkWX9-IfnCg676p2N5Fs-eQSCyqq-VAdGtXaXBMvcgtX?from_tab_name=main&vid=7525117380498853155" style="color:#1BCDFC"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-2 -2 28 28"><path fill="currentColor" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93c-.01 2.92.01 5.84-.02 8.75c-.03 1.4-.54 2.79-1.35 3.94c-1.31 1.92-3.58 3.17-5.91 3.21c-1.43.08-2.86-.31-4.08-1.03c-2.02-1.19-3.44-3.37-3.65-5.71c-.02-.5-.03-1-.01-1.49c.18-1.9 1.12-3.72 2.58-4.96c1.66-1.44 3.98-2.13 6.15-1.72c.02 1.48-.04 2.96-.04 4.44c-.9-.32-1.98-.23-2.8.12c-.79.33-1.37 1.05-1.57 1.88a4 4 0 0 0 .1 2.22c.19.64.6 1.25 1.16 1.62c.94.7 2.27.78 3.29.3c1.02-.41 1.67-1.44 1.77-2.52c.05-2.61.02-5.23.03-7.85c0-1.7.01-3.4.01-5.11z"/></svg></a><a class="nav-item" title="bilibili!" target="_blank" rel="noopener" href="https://space.bilibili.com/3546789657447182?spm_id_from=333.1007.0.0" style="color:#FA6400"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-2 -2 28 28"><path fill="currentColor" d="M17.813 4.653h.854c1.51.054 2.767.57 3.707 1.49c.97.904 1.56 2.03 1.624 3.567v7.83c-.03 1.547-.62 2.673-1.624 3.567c-.94.92-2.197 1.436-3.707 1.49H5.252c-1.51-.054-2.767-.57-3.707-1.49c-.97-.904-1.56-2.03-1.624-3.567v-7.83c.03-1.547.62-2.673 1.624-3.567c.94-.92 2.197-1.436 3.707-1.49h.854L5.16 1.59a.75.75 0 0 1 1.259-.814l3.203 3.877h4.756l3.203-3.877a.75.75 0 1 1 1.26.814zm-12.56 2.347c-1.025.032-1.84.32-2.392.83c-.58.513-.912 1.21-.937 2.222v7.83c.025 1.01.356 1.708.937 2.22c.553.51 1.368.803 2.39.833h13.496c1.025-.03 1.84-.324 2.392-.832c.58-.513.912-1.21.937-2.222v-7.83c-.025-1.01-.356-1.708-.937-2.222c-.553-.51-1.368-.804-2.39-.834zm1.18 3.61c.642 0 1.162.51 1.162 1.14v2.09c0 .63-.52 1.14-1.162 1.14c-.642 0-1.162-.51-1.162-1.14v-2.09c0-.63.52-1.14 1.162-1.14zm11.134 0c.642 0 1.162.51 1.162 1.14v2.09c0 .63-.52 1.14-1.162 1.14c-.642 0-1.162-.51-1.162-1.14v-2.09c0-.63.52-1.14 1.162-1.14zm-4.14 5.923a.75.75 0 1 1 0 1.5a13 13 0 0 1-4.907-1v-1.5c1.49.65 3.134 1 4.907 1z"/></svg></a><a class="nav-item" title="GitHub" target="_blank" rel="noopener" href="https://github.com/zbh13782-lang" style="color:#24292e"><svg aria-hidden="true" role="img" class="color-icon-primary" viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" style="display:inline-block;user-select:none;vertical-align:text-bottom;overflow:visible"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a><a class="nav-item" title="LeetCode" target="_blank" rel="noopener" href="https://leetcode.cn/u/hao-hao-shui-shui-hao-hao/" style="color:#FFA116"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M13.483 0a1.374 1.374 0 0 0-.961.41L7.116 5.845a1.374 1.374 0 0 0 0 1.942a1.374 1.374 0 0 0 1.942 0l5.405-5.404L24 12.062l-9.537 9.536l-5.405-5.404a1.374 1.374 0 0 0-1.942 0a1.374 1.374 0 0 0 0 1.942l7.116 7.116a1.374 1.374 0 0 0 1.942 0L24 14.281a1.2 1.2 0 0 0 0-1.693L14.444.41A1.374 1.374 0 0 0 13.483 0ZM1.374 7.557a1.374 1.374 0 0 0-1.374 1.374v1.374a1.374 1.374 0 0 0 .41.971L5.845 15.6l9.537 9.537a1.374 1.374 0 0 0 1.942 0a1.374 1.374 0 0 0 0-1.942l-9.537-9.537L1.942 8.2a1.374 1.374 0 0 0-.568-.643Z"/></svg></a><a class="nav-item" title="朋友" href="/myblog/friends/" style="color:#F44336"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m13.629 20.472l-.542.916c-.483.816-1.69.816-2.174 0l-.542-.916c-.42-.71-.63-1.066-.968-1.262c-.338-.197-.763-.204-1.613-.219c-1.256-.021-2.043-.098-2.703-.372a5 5 0 0 1-2.706-2.706C2 14.995 2 13.83 2 11.5v-1c0-3.273 0-4.91.737-6.112a5 5 0 0 1 1.65-1.651C5.59 2 7.228 2 10.5 2h3c3.273 0 4.91 0 6.113.737a5 5 0 0 1 1.65 1.65C22 5.59 22 7.228 22 10.5v1c0 2.33 0 3.495-.38 4.413a5 5 0 0 1-2.707 2.706c-.66.274-1.447.35-2.703.372c-.85.015-1.275.022-1.613.219c-.338.196-.548.551-.968 1.262" opacity=".5"/><path fill="currentColor" d="M10.99 14.308c-1.327-.978-3.49-2.84-3.49-4.593c0-2.677 2.475-3.677 4.5-1.609c2.025-2.068 4.5-1.068 4.5 1.609c0 1.752-2.163 3.615-3.49 4.593c-.454.335-.681.502-1.01.502c-.329 0-.556-.167-1.01-.502"/></svg></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"><span class="title">Agent的一些概念和一些碎碎念</span></a><a class="item title" href="/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a></div></widget>
+</div>
+
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/Agent/">Agent</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-05-01T17:48:52.997Z">2026-05-02</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-05-01T17:53:07.124Z">2026-05-02</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>Agent的一些概念和一些碎碎念</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><p>写这些的初衷仅为了个人学习，准备八股，有些问题如果和你思考的不一样，欢迎提出你的思考～</p>
+<h2 id="function-callingtool-callmcp"><a class="markdownIt-Anchor" href="#function-callingtool-callmcp"></a> Function Calling,Tool call,MCP</h2>
+<h3 id="前情提要"><a class="markdownIt-Anchor" href="#前情提要"></a> 前情提要</h3>
+<p>二者解决的都是模型要调用<strong>工具</strong>的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题。</p>
+<img src="/myblog/images/Agent零碎概念/function-calling.png" width="701" title="" crop="0,0,1,1" id="ue238de87" class="ne-image">
+<p>另外<a href="about:blank">OpenAI的这个文章</a>关于FC写的蛮好的。</p>
+<p>langchain的tool都是用了 <strong>@tool</strong> 这个装饰器来封装的。</p>
+<p>LangChain 会自动把 @tool 装饰的函数 → 转换成 JSON Schema 发给 OpenAI。</p>
+<p>顺带一提，windows运行bash会炸，因为powershell问题，感慨mac的类unix方便之处。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"><span class="meta">@tool(<span class="params"><span class="string">&quot;run_bash&quot;</span></span>) </span><span class="comment">#name</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止执行任何高危系统命令。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 你要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment">#上面是description和parameters</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 超时 100 秒，防止卡死</span></span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ bash工具执行超时（超过100秒），已终止&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 执行失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>转换一下就是OpenAI要求的格式。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;run_bash&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;执行安全的 bash 命令，禁止执行任何高危系统命令。只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。\n\n    Args:\n        command: 你要执行的 bash 命令&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;你要执行的 bash 命令&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;command&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>要是用langchain的fastmcp，那就写成下面这样，这样的话，这个工具就可以换框架，换语言使用了，因为这样就统一了要求的Json Schema格式了。</p>
+<p>封装成 MCP 后，它不再只是一个 Python 函数，变成了可共享、可远程、可跨框架的标准 AI 工具。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mcp.server.fastmcp <span class="keyword">import</span> FastMCP</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">mcp = FastMCP(<span class="string">&quot;bash_tool&quot;</span>)  <span class="comment"># 服务名</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@mcp.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止高危操作。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ 超时（100秒）&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    mcp.run()  <span class="comment"># 默认用 stdio 启动</span></span><br></pre></td></tr></table></figure>
+<p>另外，MCP Client就可以完成Agent要用的tools的封装。</p>
+<p>另外说一下传输协议的问题吧。</p>
+<h3 id="传输协议"><a class="markdownIt-Anchor" href="#传输协议"></a> 传输协议</h3>
+<h4 id="本地mcp-tool"><a class="markdownIt-Anchor" href="#本地mcp-tool"></a> 本地MCP tool</h4>
+<p>本地就是用stdio，这是一种进程间管道通信协议（操作系统讲的）。</p>
+<ul>
+<li>客户端（LangChain MCP Adapter）把 MCP Server 当成子进程启动</li>
+<li>客户端 → 子进程：写 stdin</li>
+<li>子进程 → 客户端：写 stdout</li>
+<li>消息格式：每行一个 JSON‑RPC 2.0 消息</li>
+</ul>
+<h4 id="外部mcp-tool"><a class="markdownIt-Anchor" href="#外部mcp-tool"></a> 外部MCP tool</h4>
+<p>比如GitHub MCP Server，也是我项目(about:blank)里用到的那个，遵守的是 Streamable HTTP 协议，以前是http + sse，这是属于计算机网络知识。我会在网络部分的八股和Agent八股里面详细说的。</p>
+<p>旧版：<strong>HTTP + SSE（Server‑Sent Events）</strong></p>
+<ul>
+<li>客户端发 HTTP POST → 服务端</li>
+<li>服务端用 SSE 长连接推数据 → 客户端（单向流）</li>
+</ul>
+<p>通常是两个端点：</p>
+<p>/sse       用 GET 打开 SSE 长连接，服务端通过它推消息</p>
+<p>/messages  用 POST 发送客户端到服务端的 JSON-RPC 消息</p>
+<p><strong>举个例子：</strong></p>
+<ol>
+<li>客户端 GET /sse</li>
+<li>服务端保持这个 SSE 连接不关闭</li>
+<li>服务端通过 SSE 发一个 endpoint 事件，告诉客户端 POST 地址</li>
+<li>客户端 POST /messages 发送 initialize、tools/call 等 JSON-RPC 消息</li>
+<li>服务端如果要回消息、推通知、发进度，就通过之前那条 SSE 长连接推给客户端</li>
+</ol>
+<p>新版：<strong>Streamable HTTP</strong></p>
+<ul>
+<li>一个统一 HTTP 端点，同时支持：
+<ul>
+<li>POST：客户端 → 服务端（请求）</li>
+<li>GET+SSE：服务端 → 客户端（响应 / 流式推送）</li>
+</ul>
+</li>
+<li>双向流、支持会话、多客户端、可重连 Model Context Protocol</li>
+</ul>
+<p>通常有一个端点：/mcp</p>
+<p><strong>简单请求的例子：</strong></p>
+<ol>
+<li>客户端 POST /mcp<br />
+body: {“jsonrpc”:“2.0”,“id”:1,“method”:“tools/list”}</li>
+<li>服务端直接返回：<br />
+Content-Type: application/json{“jsonrpc”:“2.0”,“id”:1,“result”:{…}}</li>
+</ol>
+<p><strong>流式请求的例子：</strong></p>
+<ol>
+<li>客户端 POST /mcp<br />
+body: {“jsonrpc”:“2.0”,“id”:2,“method”:“tools/call”,…}</li>
+<li>服务端返回：<br />
+Content-Type: text/event-stream<br />
+event: message<br />
+data: {“jsonrpc”:“2.0”,“method”:“notifications/progress”,…}<br />
+event: message<br />
+data: {“jsonrpc”:“2.0”,“id”:2,“result”:{…}}</li>
+</ol>
+<p>这时 SSE 只是这次 POST 响应的流式返回形式，而不是必须提前建立的一条专用 <code>/sse</code> 通道。</p>
+<p>二者的比较：原来是专门要先让客户端发送一个GET请求，之后服务端建立一个SSE管道来进行后续的服务端到客户端通信，这中间如果断连了，服务端无法及时感知到。原来的http+sse更适合长连接情况。</p>
+<p>无论是本地还是外部，都遵循了JSON-RPC2.0格式，这也是MCP存在的一个必要吧，同意了一切的工具格式。</p>
+<h2 id="skill"><a class="markdownIt-Anchor" href="#skill"></a> SKILL</h2>
+<p>书接上回，讲到了MCP，那就紧接着说说skill吧，首先二者不算是同一层的东西，更像是上下层，skill教会模型具体的任务说明书，这个任务需要用到工具的时候，MCP给了模型工具的使用说明书，skill更像是一种全局策略。</p>
+<h3 id="渐进式加载动态加载"><a class="markdownIt-Anchor" href="#渐进式加载动态加载"></a> 渐进式加载（动态加载）</h3>
+<p>这是skill设计的巧妙之处，这就解决了太长的skill塞入prompt的问题，只需要把skill的name和简短的description加载到system prompt，就能实现模型的skill。</p>
+<h4 id="第一层只看-skill-元数据"><a class="markdownIt-Anchor" href="#第一层只看-skill-元数据"></a> 第一层：只看 Skill 元数据</h4>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">invoice-parser</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">parse</span> <span class="string">invoice</span> <span class="string">PDFs,</span> <span class="string">extract</span> <span class="string">vendor,</span> <span class="string">date,</span> <span class="string">line</span> <span class="string">items,</span> <span class="string">totals,</span> <span class="string">and</span> <span class="string">output</span> <span class="string">structured</span> <span class="string">JSON.</span> <span class="string">Use</span> <span class="string">when</span> <span class="string">the</span> <span class="string">user</span> <span class="string">uploads</span> <span class="string">invoices</span> <span class="string">or</span> <span class="string">asks</span> <span class="string">to</span> <span class="string">extract,</span> <span class="string">validate,</span> <span class="string">summarize,</span> <span class="string">or</span> <span class="string">convert</span> <span class="string">invoice</span> <span class="string">data.</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
+<p>关键的在于description，决定要不要用。</p>
+<h4 id="第二层触发后读取-skillmd主体"><a class="markdownIt-Anchor" href="#第二层触发后读取-skillmd主体"></a> 第二层：触发后读取 SKILL.md主体</h4>
+<p>正文应该像“控制面板”，不是知识库。它放：</p>
+<ul>
+<li>核心工作流</li>
+<li>必须遵守的规则</li>
+<li>资源导航</li>
+<li>什么时候读取哪个 reference</li>
+<li>什么时候运行哪个 script</li>
+</ul>
+<h4 id="第三层按需读取-references-assets-scripts"><a class="markdownIt-Anchor" href="#第三层按需读取-references-assets-scripts"></a> 第三层：按需读取 references、assets、scripts</h4>
+<p>比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">invoice-parser/</span><br><span class="line">├── SKILL.md</span><br><span class="line">├── references/</span><br><span class="line">│   ├── schema.md</span><br><span class="line">│   ├── tax-rules.md</span><br><span class="line">│   └── vendor-formats.md</span><br><span class="line">├── scripts/</span><br><span class="line">│   └── validate_totals.py</span><br><span class="line">└── assets/</span><br><span class="line">    └── output-template.xlsx</span><br></pre></td></tr></table></figure>
+<p><strong>description</strong> 负责触发，<strong><a target="_blank" rel="noopener" href="http://SKILL.md">SKILL.md</a></strong> 负责调度，references/scripts/assets 负责细节。</p>
+<p>这里不得不感慨Anthropic的牛比之处了，虽然MCP和SKILL现在看起来是历史的必然趋势，但是人家提出来并发扬了确实吊。</p>
+<h3 id="沙箱"><a class="markdownIt-Anchor" href="#沙箱"></a> 沙箱</h3>
+<p>SKILL要不要放到沙箱呢？刷牛客的时候经常那个看到这个面试题，就一起说明白吧。</p>
+<p>可以，但分情况。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">模式 A：Skill 作为智能体本体的一部分</span><br><span class="line">智能体进程可以直接读取 skill 文件夹。</span><br><span class="line">适合：本地 Agent、单机 Agent、开发调试。</span><br><span class="line"></span><br><span class="line">模式 B：Skill 放在独立沙箱里</span><br><span class="line">智能体不能直接读沙箱文件，只能通过受控通信协议请求沙箱读取、执行、返回内容。</span><br><span class="line">适合：多租户、安全隔离、不信任 Skill 脚本或资源。</span><br></pre></td></tr></table></figure>
+<p>具体一点：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Host / Agent文件系统</span><br><span class="line">├── agent_server.py</span><br><span class="line">├── orchestration/</span><br><span class="line">└── memory/</span><br><span class="line"></span><br><span class="line">Sandbox 文件系统</span><br><span class="line">├── /skills/</span><br><span class="line">│   └── invoice-parser/</span><br><span class="line">│       ├── SKILL.md</span><br><span class="line">│       ├── references/</span><br><span class="line">│       │   ├── schema.md</span><br><span class="line">│       │   └── tax-rules.md</span><br><span class="line">│       ├── scripts/</span><br><span class="line">│       │   └── validate_totals.py</span><br><span class="line">│       └── assets/</span><br><span class="line">│           └── template.xlsx</span><br><span class="line">└── /workspace/</span><br><span class="line">    ├── input/</span><br><span class="line">    └── output/</span><br></pre></td></tr></table></figure>
+<p>这时 Skill 文件夹在沙箱内部，那么agent如何完成跨文件的交互？</p>
+<p>举个完整通信的例子：</p>
+<p>用户说：帮我检查这张 invoice.pdf 的总额和税额是否正确。</p>
+<h4 id="step-1agent-上传文件到沙箱"><a class="markdownIt-Anchor" href="#step-1agent-上传文件到沙箱"></a> Step 1：Agent 上传文件到沙箱</h4>
+<p>这一步，意味着Agent要把要处理的文件放入沙箱的worksapce，才可以进行后续操作。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;workspace.put_file&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;filename&quot;</span><span class="punctuation">:</span> <span class="string">&quot;invoice.pdf&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;content_base64&quot;</span><span class="punctuation">:</span> <span class="string">&quot;...&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Runtime 返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;result&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/workspace/input/invoice.pdf&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="step-2agent-获取-skill-index"><a class="markdownIt-Anchor" href="#step-2agent-获取-skill-index"></a> Step 2：Agent 获取 Skill index</h4>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;skills.list&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Runtime返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;result&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;invoice-parser&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;parse invoice PDFs, extract vendor, date, line items, totals, and validate invoice totals...&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Agent判断要用这个SKILL，接下来的步骤就不用多说了，Agent读取主体，reference之类的继续操作。</p>
+<h3 id="通信方式"><a class="markdownIt-Anchor" href="#通信方式"></a> 通信方式</h3>
+<h4 id="方案-aagent-和沙箱共享挂载目录"><a class="markdownIt-Anchor" href="#方案-aagent-和沙箱共享挂载目录"></a> 方案 A：Agent 和沙箱共享挂载目录</h4>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Host:</span><br><span class="line">  /var/agent/tasks/task_123/input</span><br><span class="line">  /var/agent/tasks/task_123/output</span><br><span class="line"></span><br><span class="line">Sandbox:</span><br><span class="line">  /workspace/input  -&gt; host input</span><br><span class="line">  /workspace/output -&gt; host output</span><br></pre></td></tr></table></figure>
+<p>文件通过挂载目录传递。</p>
+<p>控制命令通过 API / JSON-RPC 传递。</p>
+<p>适合本地 Agent,如果SKILL只是被读取，建议把SKILL挂载为只读。</p>
+<h4 id="方案-b不共享文件系统只走-api-传文件"><a class="markdownIt-Anchor" href="#方案-b不共享文件系统只走-api-传文件"></a> 方案 B：不共享文件系统，只走 API 传文件</h4>
+<p>适合多租户，但大文件传输麻烦。</p>
+<h4 id="方案-cskill-在-host只把需要的文件复制进沙箱"><a class="markdownIt-Anchor" href="#方案-cskill-在-host只把需要的文件复制进沙箱"></a> 方案 C：Skill 在 Host，只把需要的文件复制进沙箱</h4>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. Agent 在 Host 上维护 Skill library</span><br><span class="line"></span><br><span class="line">2. 命中某个 Skill</span><br><span class="line"></span><br><span class="line">3. 只把该 Skill 的 SKILL.md / 必要脚本复制进沙箱</span><br><span class="line"></span><br><span class="line">4. 执行完销毁</span><br></pre></td></tr></table></figure>
+<h4 id="方案-dskill-完全在沙箱镜像中"><a class="markdownIt-Anchor" href="#方案-dskill-完全在沙箱镜像中"></a> 方案 D：Skill 完全在沙箱镜像中</h4>
+<p>COPY skills /skills</p>
+<h3 id="解决方案"><a class="markdownIt-Anchor" href="#解决方案"></a> 解决方案</h3>
+<p><strong>Skill 不要长期只放在沙箱里；应该放在 Host 的 Skill Library 里，由 Agent 可控索引。真正执行时，再把当前需要的 Skill 只读挂载到沙箱。</strong></p>
+<p><strong>整体架构</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Host / Agent 侧</span><br><span class="line">├── agent_server.py</span><br><span class="line">├── skill_registry.py</span><br><span class="line">├── skills/</span><br><span class="line">│   ├── invoice-parser/</span><br><span class="line">│   │   ├── SKILL.md</span><br><span class="line">│   │   ├── references/</span><br><span class="line">│   │   ├── scripts/</span><br><span class="line">│   │   └── assets/</span><br><span class="line">│   └── customer-summary/</span><br><span class="line">│       ├── SKILL.md</span><br><span class="line">│       └── references/</span><br><span class="line">└── tasks/</span><br><span class="line">    └── task_123/</span><br><span class="line">        ├── input/</span><br><span class="line">        └── output/</span><br><span class="line"></span><br><span class="line">Sandbox / Docker 侧，任务执行时临时创建</span><br><span class="line">├── /skill/                 # 只挂载当前命中的 Skill</span><br><span class="line">│   ├── SKILL.md</span><br><span class="line">│   ├── references/</span><br><span class="line">│   ├── scripts/</span><br><span class="line">│   └── assets/</span><br><span class="line">└── /workspace/</span><br><span class="line">    ├── input/              # 只读</span><br><span class="line">    └── output/             # 可写</span><br></pre></td></tr></table></figure>
+<p>Host 保存完整 Skill Library。</p>
+<p>Agent 在 Host 上做 Skill 发现和渐进式读取。</p>
+<p>Sandbox 只负责执行当前任务。</p>
+<p>每次只挂载一个 Skill 到 /skill。</p>
+<p>执行完销毁 Sandbox。</p>
+<h2 id="agent思维范式"><a class="markdownIt-Anchor" href="#agent思维范式"></a> Agent思维范式</h2>
+<h3 id="react"><a class="markdownIt-Anchor" href="#react"></a> React</h3>
+<p>最著名的莫过于React了，这可不是前端框架。而是Reason+act，底层就是while True。</p>
+<p><strong>流程图：</strong></p>
+<p>用户目标<br />
+↓<br />
+Agent 判断需要什么信息<br />
+↓<br />
+调用工具<br />
+↓<br />
+观察工具返回<br />
+↓<br />
+继续推理<br />
+↓<br />
+再调用工具或输出答案</p>
+<p>langchain其实自己封装的create_agent函数用到的就是这个范式。</p>
+<h3 id="plan-and-execute"><a class="markdownIt-Anchor" href="#plan-and-execute"></a> Plan-and-Execute</h3>
+<p>这个也顾名思义了，后面还有replan，也就是agent自己再次细分计划的过程。</p>
+<p><strong>流程图：</strong></p>
+<p>目标<br />
+↓<br />
+拆解任务<br />
+↓<br />
+形成步骤计划<br />
+↓<br />
+逐步执行<br />
+↓<br />
+汇总结果</p>
+<h3 id="reflection"><a class="markdownIt-Anchor" href="#reflection"></a> Reflection</h3>
+<p>反思，顾名思义。</p>
+<p><strong>流程图：</strong></p>
+<p>生成初稿<br />
+↓<br />
+自我检查<br />
+↓<br />
+发现问题<br />
+↓<br />
+修改<br />
+↓<br />
+再次检查</p>
+<p>无论哪个吧，最最重要的我觉得还是Human in the Loop，一定要管理好agent的行为，也是Harness工程的核心。</p>
+<h2 id="single-agent和multi-agent"><a class="markdownIt-Anchor" href="#single-agent和multi-agent"></a> Single-Agent和Multi-Agent</h2>
+<h3 id="single-agent"><a class="markdownIt-Anchor" href="#single-agent"></a> Single Agent</h3>
+<p>单Agent工作，优点是适合小工作，因为记忆有限的问题，在处理小问题的时候非常好用。</p>
+<p>缺点就是一个Agent要是干大工作要累死（上下文爆炸），还是因为上下文的问题。</p>
+<h3 id="multi-agent"><a class="markdownIt-Anchor" href="#multi-agent"></a> Multi Agent</h3>
+<h4 id="a2a"><a class="markdownIt-Anchor" href="#a2a"></a> A2A</h4>
+<p>Google推出的一个协议，解决多Agent之间的通信问题。</p>
+<p>提到通信问题，不得不提一个经典面试题，也是被问烂了：</p>
+<h5 id="agent怎么保证输出格式"><a class="markdownIt-Anchor" href="#agent怎么保证输出格式"></a> Agent怎么保证输出格式？</h5>
+<p>例如JSON。</p>
+<h6 id="1-response-format"><a class="markdownIt-Anchor" href="#1-response-format"></a> 1. response format</h6>
+<p>这是目前最稳健的方法。主流的大模型 API（如 OpenAI, DeepSeek, Qwen）都提供了强制 JSON 输出的参数。开启后，模型在底层生成 Token 时会被限制只能生成符合 JSON 语法的字符。</p>
+<h6 id="2-prompt"><a class="markdownIt-Anchor" href="#2-prompt"></a> 2. Prompt</h6>
+<p>你是一个数据提取器，请返回JSON格式。</p>
+<h6 id="3-pydantictypeddict"><a class="markdownIt-Anchor" href="#3-pydantictypeddict"></a> 3. Pydantic，TypedDict</h6>
+<p>比如pydantic：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UserInfo</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    name: <span class="built_in">str</span> = Field(..., description=<span class="string">&quot;用户的全名&quot;</span>)</span><br><span class="line">    age: <span class="built_in">int</span> = Field(..., description=<span class="string">&quot;用户的年龄&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在使用 LangChain 或类似框架时</span></span><br><span class="line">llm_with_structured_output = llm.with_structured_output(UserInfo)</span><br><span class="line">result = llm_with_structured_output.invoke(<span class="string">&quot;我叫zbh，今年20岁&quot;</span>)</span><br><span class="line"><span class="comment"># result 直接就是 UserInfo 对象，无需手动解析 JSON</span></span><br></pre></td></tr></table></figure>
+<h4 id="分工问题"><a class="markdownIt-Anchor" href="#分工问题"></a> 分工问题</h4>
+<p>有了多Agent，就很好解决了单Agent的上下文问题了，比如某个任务需要很干净的上下文去做（搜索网页之类的），只需要子Agent把返回的结果和总结给到Leader，而不要关注你搜索到多少，搜索到多好。</p>
+<p>同时，加入我自己的一些理解，一定不要让Agent自主决定去开一个子Agent干，而是要加入人为干预，写入system prompt，什么任务可以开子Agent，什么任务可以交给别的Agent来干。</p>
+<p>举个例子：</p>
+<ol>
+<li>父Agent传入了错误信息，那子Agent又不知道是错的，干脆一错到底。</li>
+<li>比如code过程</li>
+</ol>
+<p>Leader 设计方案，说设计没问题</p>
+<p>Coder 写代码，说按计划写的</p>
+<p>Tester 跑测试，说环境不完整</p>
+<p>Reviewer 提意见，说我只是审查</p>
+<p>最后活不还是全都交给Leader做了吗，阴阳一手大学小组分工。</p>
+<h2 id="从cc看promptcontextharness实践"><a class="markdownIt-Anchor" href="#从cc看promptcontextharness实践"></a> 从CC看Prompt，Context，Harness实践</h2>
+<p>主要参考：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/KbviOJ6q-K4ik_wzsUs2dw?open_in_browser=true">https://mp.weixin.qq.com/s/KbviOJ6q-K4ik_wzsUs2dw?open_in_browser=true</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/YgGW92VBP8s846yzIxjVWQ">https://mp.weixin.qq.com/s/YgGW92VBP8s846yzIxjVWQ</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</a></p>
+<p>也可以去看openai，langchain的相关文章，写的都挺好，建议结合ai食用，哪里不明白就直接问ai。</p>
+<h3 id="prompt"><a class="markdownIt-Anchor" href="#prompt"></a> Prompt</h3>
+<p>与ai最直接的沟通，在对话时有system prompt，<a target="_blank" rel="noopener" href="http://xn--memory-oc8lt7bg69r.md">要拼接memory.md</a>，<a target="_blank" rel="noopener" href="http://skill.md">skill.md</a>，claude.md等等。</p>
+<p>这也出现了one shot，zero shot，few shot，就比如前面讲的让agent输出json格式，可以用few shot来引导。</p>
+<h3 id="context"><a class="markdownIt-Anchor" href="#context"></a> Context</h3>
+<p>其实就是模型的上下文记忆，这里比较重要的就是三层记忆架构 和 三层渐进式压缩记忆。</p>
+<h4 id="三层记忆架构"><a class="markdownIt-Anchor" href="#三层记忆架构"></a> 三层记忆架构</h4>
+<ul>
+<li>短期记忆（当前对话）</li>
+<li>中期记忆（智能压缩）</li>
+<li>长期记忆（<a target="_blank" rel="noopener" href="http://CLAUDE.md">CLAUDE.md</a>）</li>
+</ul>
+<h4 id="三层压缩架构"><a class="markdownIt-Anchor" href="#三层压缩架构"></a> 三层压缩架构</h4>
+<ul>
+<li><strong>Layer 1: MicroCompact（微压缩）</strong> — 无 LLM 调用，纯规则驱动，极致轻量。</li>
+</ul>
+<p>这一层并不依靠ai去总结内容，而是针对工具上下文。</p>
+<p>系统定义了一个可压缩工具白名单（COMPACTABLE_TOOLS），仅针对如 Bash、Read、Grep、Glob 等产生大量标准输出的工具进行压缩处理；而对于 Edit、Write 等涉及核心状态变更的操作，其输出则被完整保留，以确保后续决策的准确性。这种“抓大放小”的策略，既控制了体积，又守住了安全底线。</p>
+<ul>
+<li><strong>Layer 2: Session Memory Compact（会话记忆压缩）</strong> — 基于已有会话记忆进行替换，零额外推理成本。</li>
+</ul>
+<p>仅完整保留最近5轮左右的完整会话，这是一个有门槛的压缩触发。</p>
+<ul>
+<li><strong>Layer 3: Full LLM Compact（完全压缩）</strong> — 调用 LLM 生成结构化摘要，精度最高但成本也最高。</li>
+</ul>
+<p>有了这三层之后，就可以完成自动压缩机制了。</p>
+<p>Claude Code的策略是设定一个安全缓冲水位线（AUTOCOMPACT_BUFFER_TOKENS = 13,000）。当上下文窗口剩余空间低于这个阈值时，系统会自动介入判断是否需要压缩。</p>
+<p>整个决策流程是一个典型的分级回退策略（Fallback Strategy）：</p>
+<ul>
+<li><strong>首选快速路径：</strong> 首先尝试 Session Memory Compact。因为它不需要额外的 LLM 调用，速度最快、成本最低。如果满足触发条件（Token 数和消息数达标），立即执行。</li>
+<li><strong>降级重型路径：</strong> 如果 SM Compact 不满足条件（例如记忆尚未生成）或压缩后仍无法满足要求，系统会自动回退到 Full LLM Compact，不惜成本地生成高质量摘要以保全任务继续运行。</li>
+</ul>
+<h3 id="harness"><a class="markdownIt-Anchor" href="#harness"></a> Harness</h3>
+<p>Harness约束的不是AI本身的能力（大脑），AI依旧强大，约束的是AI的手脚（具体而言就是Tool的权限）。</p>
+<p>有些工具需要约束危险命令（比如bash），有些需要用户的确认才可以执行，总的而言都可以约束在沙箱里。</p>
+<p>另外这里面我觉得Hook的设计很好，以后详细说说吧。</p>
+<h2 id="openclawhermes"><a class="markdownIt-Anchor" href="#openclawhermes"></a> OpenClaw，Hermes</h2>
+<p>Todo</p>
+<h2 id="结尾"><a class="markdownIt-Anchor" href="#结尾"></a> 结尾</h2>
+<p>写完这篇文章我再自己看一下，感觉逻辑好像很混乱，如果误导到你了请自行AI，但是我自己看懂就行了。后面继续写一个项目相关的文章，主要针对面试，押一下面试问的问题，然后写关于数据库的八股和网络的八股吧，五一假期应该可以玩完。</p>
+<p>最后推荐一个我最近很喜欢看的一个项目，虽然都是demo，但是通过学习这些demo，自己就可以写出来属于自己的claude code。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shareAI-lab/learn-claude-code">https://github.com/shareAI-lab/learn-claude-code</a></p>
+<p>另外，目前笔记大多记在语雀上（因为我mac和windows都要写，方便自动保存，以后可能会尝试obsidian+github管理吧）。我要是直接复制到obsidian再git，可能会导致格式问题出现，试了试claudian帮我整理，但效果不理想，我自己也懒得管了。后面我自己再整理一下吧。</p>
+</article>
+<div class="article-footer">
+    <section id="license">
+      <div class="header"><span>License</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    
+
+</div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/">RAG项目相关问题</a></div></section></div>
+
+
+
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><p>📍 中国 · 上海 | 📧 zbh13782@gmail.com</p>
+<p>当前时间: <span id="footer-time"></span></p>
+本博客由 zbh 使用 [Stellar 主题创建。
+本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right"><div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#function-callingtool-callmcp"><span class="toc-text"> Function Calling,Tool call,MCP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E6%83%85%E6%8F%90%E8%A6%81"><span class="toc-text"> 前情提要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE"><span class="toc-text"> 传输协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0mcp-tool"><span class="toc-text"> 本地MCP tool</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E9%83%A8mcp-tool"><span class="toc-text"> 外部MCP tool</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#skill"><span class="toc-text"> SKILL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%90%E8%BF%9B%E5%BC%8F%E5%8A%A0%E8%BD%BD%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD"><span class="toc-text"> 渐进式加载（动态加载）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%B1%82%E5%8F%AA%E7%9C%8B-skill-%E5%85%83%E6%95%B0%E6%8D%AE"><span class="toc-text"> 第一层：只看 Skill 元数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%B1%82%E8%A7%A6%E5%8F%91%E5%90%8E%E8%AF%BB%E5%8F%96-skillmd%E4%B8%BB%E4%BD%93"><span class="toc-text"> 第二层：触发后读取 SKILL.md主体</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E5%B1%82%E6%8C%89%E9%9C%80%E8%AF%BB%E5%8F%96-references-assets-scripts"><span class="toc-text"> 第三层：按需读取 references、assets、scripts</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B2%99%E7%AE%B1"><span class="toc-text"> 沙箱</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#step-1agent-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6%E5%88%B0%E6%B2%99%E7%AE%B1"><span class="toc-text"> Step 1：Agent 上传文件到沙箱</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#step-2agent-%E8%8E%B7%E5%8F%96-skill-index"><span class="toc-text"> Step 2：Agent 获取 Skill index</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F"><span class="toc-text"> 通信方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%A1%88-aagent-%E5%92%8C%E6%B2%99%E7%AE%B1%E5%85%B1%E4%BA%AB%E6%8C%82%E8%BD%BD%E7%9B%AE%E5%BD%95"><span class="toc-text"> 方案 A：Agent 和沙箱共享挂载目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%A1%88-b%E4%B8%8D%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%8F%AA%E8%B5%B0-api-%E4%BC%A0%E6%96%87%E4%BB%B6"><span class="toc-text"> 方案 B：不共享文件系统，只走 API 传文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%A1%88-cskill-%E5%9C%A8-host%E5%8F%AA%E6%8A%8A%E9%9C%80%E8%A6%81%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6%E8%BF%9B%E6%B2%99%E7%AE%B1"><span class="toc-text"> 方案 C：Skill 在 Host，只把需要的文件复制进沙箱</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%A1%88-dskill-%E5%AE%8C%E5%85%A8%E5%9C%A8%E6%B2%99%E7%AE%B1%E9%95%9C%E5%83%8F%E4%B8%AD"><span class="toc-text"> 方案 D：Skill 完全在沙箱镜像中</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text"> 解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#agent%E6%80%9D%E7%BB%B4%E8%8C%83%E5%BC%8F"><span class="toc-text"> Agent思维范式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#react"><span class="toc-text"> React</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#plan-and-execute"><span class="toc-text"> Plan-and-Execute</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#reflection"><span class="toc-text"> Reflection</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#single-agent%E5%92%8Cmulti-agent"><span class="toc-text"> Single-Agent和Multi-Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#single-agent"><span class="toc-text"> Single Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#multi-agent"><span class="toc-text"> Multi Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#a2a"><span class="toc-text"> A2A</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#agent%E6%80%8E%E4%B9%88%E4%BF%9D%E8%AF%81%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F"><span class="toc-text"> Agent怎么保证输出格式？</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-response-format"><span class="toc-text"> 1. response format</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-prompt"><span class="toc-text"> 2. Prompt</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-pydantictypeddict"><span class="toc-text"> 3. Pydantic，TypedDict</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%B7%A5%E9%97%AE%E9%A2%98"><span class="toc-text"> 分工问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8Ecc%E7%9C%8Bpromptcontextharness%E5%AE%9E%E8%B7%B5"><span class="toc-text"> 从CC看Prompt，Context，Harness实践</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#prompt"><span class="toc-text"> Prompt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#context"><span class="toc-text"> Context</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E5%B1%82%E8%AE%B0%E5%BF%86%E6%9E%B6%E6%9E%84"><span class="toc-text"> 三层记忆架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E5%B1%82%E5%8E%8B%E7%BC%A9%E6%9E%B6%E6%9E%84"><span class="toc-text"> 三层压缩架构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#harness"><span class="toc-text"> Harness</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#openclawhermes"><span class="toc-text"> OpenClaw，Hermes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E5%B0%BE"><span class="toc-text"> 结尾</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","checklink":"/js/plugins/video.js"};
+  // Fix: Ensure page is at the correct top position on data load
+  if (history.scrollRestoration) {
+    history.scrollRestoration = 'auto';
+  }
+  (function() {
+    const scrollHandler = () => {
+      const wikiCover = document.querySelector('#l_cover .l_cover.wiki');
+      const startEl = document.getElementById('start');
+      if (wikiCover && startEl) {
+        window.scrollTo(0, startEl.offsetTop);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
+    if (document.readyState !== 'loading') scrollHandler();
+    else document.addEventListener('DOMContentLoaded', scrollHandler);
+  })();
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/myblog/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/myblog/%5Bobject%20Object%5D`
+  }
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      // 倒序遍历避免 splice 后的索引问题
+      for (let index = this.list.length - 1; index >= 0; index--) {
+        const e = this.list[index];
+        if (e.name === name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 已加载样式缓存
+    _loadedStyles: new Set(),
+
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      // 如果样式已加载，直接返回 null
+      if (utils._loadedStyles.has(href)) {
+        return null;
+      }
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      // 标记样式为已加载 (在创建元素后立即标记，防止重复创建)
+      utils._loadedStyles.add(href);
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    // 已加载脚本缓存
+    _loadedScripts: new Set(),
+
+    // 已加载元素缓存 (使用 WeakSet 追踪元素实例,避免 PJAX 导航时的状态混淆)
+    _loadedElements: new WeakSet(),
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      // 如果脚本已加载，直接返回
+      if (utils._loadedScripts.has(src)) {
+        resolve();
+        return;
+      }
+      var script = document.createElement('script');
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        utils._loadedScripts.add(src);
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    // PJAX 事件监听器管理
+    _pjaxListeners: new Set(),
+    
+    jq: (fn, pjax = true) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+      if (pjax && !fn._pjax_registered) {
+        document.addEventListener('pjax:complete', fn);
+        fn._pjax_registered = true;
+        utils._pjaxListeners.add(fn); // 追踪监听器以便清理
+      }
+    },
+    
+    // 清理所有 PJAX 事件监听器
+    cleanupPjaxListeners: () => {
+      utils._pjaxListeners.forEach(fn => {
+        document.removeEventListener('pjax:complete', fn);
+        fn._pjax_registered = false;
+      });
+      utils._pjaxListeners.clear();
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length === 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      // 检查元素实例是否已加载 (而不是检查属性)
+      if (el && utils._loadedElements.has(el)) {
+        return;
+      }
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            // 标记元素实例为已加载
+            if (el) utils._loadedElements.add(el);
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+
+    // 插件初始化管理器 - 统一处理 DOMContentLoaded 和 pjax:complete 事件
+    _pluginInitializers: [],
+    _pluginCleanups: new Map(), // 存储每个插件的清理函数
+    
+    initPlugin: (initFn, name, options = {}) => {
+      if (!initFn || typeof initFn !== 'function') return;
+      
+      // 避免重复注册
+      const pluginName = name || initFn.name;
+      if (utils._pluginInitializers.some(p => p.name === pluginName)) return;
+      
+      // 包装初始化函数，添加防重复执行的保护
+      const wrappedInit = () => {
+        try {
+          // 在执行前先清理旧的资源
+          if (utils._pluginCleanups.has(pluginName)) {
+            const cleanup = utils._pluginCleanups.get(pluginName);
+            if (typeof cleanup === 'function') {
+              cleanup();
+            }
+          }
+          
+          // 执行初始化，可能返回清理函数
+          const cleanup = initFn();
+          
+          // 如果初始化函数返回了清理函数，保存它
+          if (typeof cleanup === 'function') {
+            utils._pluginCleanups.set(pluginName, cleanup);
+          }
+        } catch (error) {
+          console.error(`[Plugin ${pluginName}] 初始化失败:`, error);
+        }
+      };
+      
+      utils._pluginInitializers.push({ 
+        fn: wrappedInit, 
+        name: pluginName,
+        options: options 
+      });
+      
+      // 如果 DOM 已经加载完成，立即执行
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        wrappedInit();
+      } else {
+        // 否则等待 DOMContentLoaded
+        window.addEventListener('DOMContentLoaded', wrappedInit, { once: true });
+      }
+    },
+
+    // 重新初始化所有插件（用于 PJAX 等场景）
+    reinitPlugins: () => {
+      utils._pluginInitializers.forEach(plugin => {
+        // 跳过标记为不需要重新初始化的插件
+        if (plugin.options.skipReinit) return;
+        
+        try {
+          plugin.fn();
+        } catch (error) {
+          console.error(`[Plugin ${plugin.name}] 重新初始化失败:`, error);
+        }
+      });
+    },
+    
+    // 清理所有插件资源
+    cleanupPlugins: () => {
+      utils._pluginCleanups.forEach((cleanup, name) => {
+        try {
+          cleanup();
+        } catch (error) {
+          console.error(`[Plugin ${name}] 清理失败:`, error);
+        }
+      });
+      utils._pluginCleanups.clear();
+    },
+    
+    // 清理所有资源（用于页面卸载或重置）
+    cleanupAll: () => {
+      utils.cleanupPlugins();
+      utils.cleanupPjaxListeners();
+    },
+  };
+
+  // 自动处理 PJAX 事件
+  document.addEventListener('pjax:before', () => {
+    // 在导航前清理旧的 PJAX 监听器（如果需要重新注册）
+    // 注意：这里不清理，因为监听器应该是持久的
+    // utils.cleanupPjaxListeners();
+  });
+  
+  document.addEventListener('pjax:complete', () => {
+    utils.reinitPlugins();
+  });
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+
+</script>
+
+<!-- required -->
+<script src="/myblog/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+
+
+<script defer>
+  const initServices = () => {
+    // 用于存储需要清理的资源
+    let timers = [];
+    
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        const cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(cardlinks);
+          });
+        }
+      } else if (id == 'ghinfo') {
+        const els = document.querySelectorAll('.ds-ghinfo');
+        if (els.length > 0) {
+          utils.js(js, { defer: true });
+        }
+      } else if (id == 'voice') {
+        const voiceAudios = document.querySelectorAll('.voice>audio');
+        if (voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        const videos = document.querySelectorAll('.video>video');
+        if (videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        const files = document.querySelectorAll('.chat-file');
+        if (files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || id == 'memos' || id == 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          }, false);
+        }
+      }
+    }
+
+    // search
+    if (ctx.search && typeof searchFunc === 'function') {
+      const $inputArea = $("input#search-input");
+      if ($inputArea.length > 0 && !$inputArea[0]._searchInitialized) {
+        const path = ctx.search.path.startsWith('/') ? ctx.root + ctx.search.path.substring(1) : ctx.root + ctx.search.path;
+        const filter = $inputArea.attr('data-filter') || '';
+        searchFunc(path, filter, 'search-wrapper', 'search-input', 'search-result');
+        // 标记为已初始化，防止重复绑定
+        $inputArea[0]._searchInitialized = true;
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+    let firstAdjustInterval = null;
+    let mainInterval = null;
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      const date = new Date();
+      const sec = date.getSeconds();
+      firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+      timers.push(firstAdjustInterval);
+
+      function firstAdjustTime() {
+        NowTime();
+        if (firstAdjustInterval) {
+          clearInterval(firstAdjustInterval);
+          firstAdjustInterval = null;
+        }
+        mainInterval = setInterval(NowTime, 1000 * 60);
+        timers.push(mainInterval);
+      }
+
+      function NowTime() {
+        for (let i = 0; i < phoneTimes.length; ++i) {
+          const timeSpan = phoneTimes[i];
+          const date = new Date();
+          const hour = date.getHours();
+          const min = date.getMinutes();
+          timeSpan.innerHTML = check(hour) + ":" + check(min);
+        }
+      };
+
+      function check(val) {
+        if (val < 10) {
+          return ("0" + val);
+        }
+        return (val);
+      }
+    }
+
+    // chat quote - 存储事件监听器以便清理
+    const quoteClickHandlers = new Map();
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      const handler = function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      };
+      quote.addEventListener('click', handler);
+      quoteClickHandlers.set(quote, handler); // 保存处理器引用
+    });
+
+    // 返回清理函数，用于清理定时器和观察器
+    return () => {
+      // 清理所有定时器（包括可能未完成的 firstAdjustInterval）
+      timers.forEach(timer => {
+        if (timer) clearInterval(timer);
+      });
+      timers = [];
+      if (firstAdjustInterval) {
+        clearInterval(firstAdjustInterval);
+        firstAdjustInterval = null;
+      }
+      if (mainInterval) {
+        clearInterval(mainInterval);
+        mainInterval = null;
+      }
+      
+      // 断开观察器
+      if (chat_quote_obverser) {
+        chat_quote_obverser.disconnect();
+      }
+      
+      // 移除所有 click 事件监听器
+      quoteClickHandlers.forEach((handler, quote) => {
+        quote.removeEventListener('click', handler);
+      });
+      quoteClickHandlers.clear();
+    };
+  };
+
+  utils.initPlugin(initServices, 'services');
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  utils.initPlugin(() => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  }, 'swiper');
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.23/dist/katex.min.css" integrity="sha384-//SZkxyB7axjCAopkAL1E1rve+ZSPKapD89Lo/lLhcsXR+zOYl5z6zJZEFXil+q0" crossorigin="anonymous">
+<script>
+  utils.initPlugin(() => {
+    const codeElements = document.querySelectorAll('.code');
+    if (codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js', { defer: true }).then(() => {
+        if (typeof createCopyButtons === 'function') {
+          createCopyButtons(codeElements);
+        }
+      });
+    }
+  }, 'copycode');
+</script>
+
+
+<!-- inject -->
+
+<script>
+  function updateFooterTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleString('zh-CN', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit',
+      hour12: false
+    });
+    const el = document.getElementById('footer-time');
+    if (el) el.innerText = timeStr;
+  }
+  setInterval(updateFooterTime, 1000);
+  updateFooterTime();
+</script>
+</div><div class="page-loading-bar"><img src="https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd"></div></body></html>

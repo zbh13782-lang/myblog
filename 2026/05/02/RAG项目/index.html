@@ -17,19 +17,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>Agent的一些概念和一些碎碎念 - zbh Blog</title>
+  <title>RAG项目相关问题 - zbh Blog</title>
 
   
-    <meta name="description" content="写这些的初衷仅为了个人学习，准备八股。  Function Calling和MCP  前情提要 二者解决的都是模型要掉用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题  另外OpenAI的这个文章关于FC写的蛮好的 langchain的tool都是用了 **@tool 这个装饰器来封装的 LangChain 会自动把 @tool 装">
+    <meta name="description" content="离线阶段  1. 数据准备和处理 准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字。 其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是Apache Tika。 紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本。 有了纯文本，开始分">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Agent的一些概念和一些碎碎念">
-<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/">
+<meta property="og:title" content="RAG项目相关问题">
+<meta property="og:url" content="https://zbh13782-lang.github.io/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/">
 <meta property="og:site_name" content="zbh Blog">
-<meta property="og:description" content="写这些的初衷仅为了个人学习，准备八股。  Function Calling和MCP  前情提要 二者解决的都是模型要掉用工具的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题  另外OpenAI的这个文章关于FC写的蛮好的 langchain的tool都是用了 **@tool 这个装饰器来封装的 LangChain 会自动把 @tool 装">
+<meta property="og:description" content="离线阶段  1. 数据准备和处理 准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字。 其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是Apache Tika。 紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本。 有了纯文本，开始分">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
-<meta property="article:published_time" content="2026-04-30T18:34:23.402Z">
-<meta property="article:modified_time" content="2026-04-30T18:44:03.697Z">
+<meta property="article:published_time" content="2026-05-01T17:47:37.736Z">
+<meta property="article:modified_time" content="2026-05-01T17:47:37.736Z">
 <meta property="article:author" content="zbh">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://zbh13782-lang.github.io/myblog/images/hp.png">
@@ -48,7 +48,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-05-01T02:34:23+08:00","dateModified":"2026-05-01T02:44:03+08:00","datePublished":"2026-05-01T02:34:23+08:00","description":"","headline":"Agent的一些概念和一些碎碎念","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","thumbnailUrl":null,"image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"},"dateCreated":"2026-05-02T01:47:37+08:00","dateModified":"2026-05-02T01:47:37+08:00","datePublished":"2026-05-02T01:47:37+08:00","description":"","headline":"RAG项目相关问题","mainEntityOfPage":{"@type":"WebPage","@id":"https://zbh13782-lang.github.io/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/"},"publisher":{"@type":"Organization","name":"zbh","sameAs":[],"image":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png","logo":{"@type":"ImageObject","url":"https://zbh13782-lang.github.io/myblog/myblog/images/hp.png"}},"url":"https://zbh13782-lang.github.io/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/","thumbnailUrl":null,"image":[]}</script>
   
 </head>
 <body><div id="l_cover"></div><div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -65,7 +65,7 @@
 
 
 
-<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"><span class="title">Agent的一些概念和一些碎碎念</span></a><a class="item title" href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a></div></widget>
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/"><span class="title">Agent的一些概念和一些碎碎念</span></a><a class="item title" href="/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/"><span class="title">RAG项目相关问题</span></a><a class="item title" href="/myblog/2026/03/26/hello-world/"><span class="title">hello,world</span></a><a class="item title" href="/myblog/2026/04/19/sync.map/"><span class="title">sync.map</span></a><a class="item title" href="/myblog/2026/04/19/Context/"><span class="title">Go的Context</span></a><a class="item title" href="/myblog/2026/03/31/%E5%B9%B6%E6%9F%A5%E9%9B%86,%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91/"><span class="title">并查集,最小生成树</span></a><a class="item title" href="/myblog/2026/04/01/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF/"><span class="title">单源最短路</span></a><a class="item title" href="/myblog/2026/03/30/%E5%9B%BE%E8%AE%BA%201(%E5%BB%BA%E5%9B%BE%E4%B8%8E%E6%8E%92%E5%BA%8F)/"><span class="title">图论 1(建图与排序)</span></a><a class="item title" href="/myblog/2026/03/29/%E5%90%8C%E4%BD%99%E5%8E%9F%E7%90%86/"><span class="title">同余原理</span></a><a class="item title" href="/myblog/2026/03/27/dp/"><span class="title">背包dp，状态机dp</span></a></div></widget>
 </div>
 
 </div></aside><div class="l_main" id="main">
@@ -78,107 +78,323 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/myblog/myblog/">Home</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/myblog/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/myblog/categories/Agent/">Agent</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-04-30T18:34:23.402Z">2026-05-01</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-04-30T18:44:03.697Z">2026-05-01</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-05-01T17:47:37.736Z">2026-05-02</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-05-01T17:47:37.736Z">2026-05-02</time></span></div></div></div>
     
     <div class="bottom only-title">
       
       <div class="text-area">
-        <h1 class="text title"><span>Agent的一些概念和一些碎碎念</span></h1>
+        <h1 class="text title"><span>RAG项目相关问题</span></h1>
         
       </div>
     </div>
     
   </div>
-  </div><article class="md-text content"><p>写这些的初衷仅为了个人学习，准备八股。</p>
-<h2 id="function-calling和mcp"><a class="markdownIt-Anchor" href="#function-calling和mcp"></a> Function Calling和MCP</h2>
-<h3 id="前情提要"><a class="markdownIt-Anchor" href="#前情提要"></a> 前情提要</h3>
-<p>二者解决的都是模型要掉用<strong>工具</strong>的问题，MCP主要解决的是调用不同语言，不同AI，不同框架的问题，也就是模型上下文协议，规定了调用格式的问题</p>
-<img src="/myblog/images/Agent零碎概念/function-calling.png" width="701" title="" crop="0,0,1,1" id="ue238de87" class="ne-image">
-<p>另外<a href="about:blank">OpenAI的这个文章</a>关于FC写的蛮好的</p>
-<p>langchain的tool都是用了 **@tool 这个装饰器来封装的</p>
-<p>LangChain 会自动把 @tool 装饰的函数 → 转换成 JSON Schema 发给 OpenAI</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"><span class="meta">@tool(<span class="params"><span class="string">&quot;run_bash&quot;</span></span>) </span><span class="comment">#name</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止执行任何高危系统命令。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 你要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment">#上面是description和parameters</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 超时 100 秒，防止卡死</span></span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ bash工具执行超时（超过100秒），已终止&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 执行失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>转换一下就是OpenAI要求的格式</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;run_bash&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;执行安全的 bash 命令，禁止执行任何高危系统命令。只能执行查看、查询、非破坏性命令（如 ls, pwd, echo, cat 等）。\n\n    Args:\n        command: 你要执行的 bash 命令&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;command&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;你要执行的 bash 命令&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;command&quot;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>要是用langchain的fastmcp，那就写成下面这样，这样的话，这个工具就可以换框架，换语言使用了，因为这样就统一了要求的Json Schema格式了</p>
-<p>封装成 MCP 后，它不再只是一个 Python 函数，变成了**<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">可共享、可远程、可跨框架的标准 AI 工具</font>**。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mcp.server.fastmcp <span class="keyword">import</span> FastMCP</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">mcp = FastMCP(<span class="string">&quot;bash_tool&quot;</span>)  <span class="comment"># 服务名</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@mcp.tool()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bash</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行安全的 bash 命令，禁止高危操作。</span></span><br><span class="line"><span class="string">    只能执行查看、查询、非破坏性命令（ls, pwd, echo, cat 等）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        command: 要执行的 bash 命令</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        result = subprocess.run(</span><br><span class="line">            command,</span><br><span class="line">            shell=<span class="literal">True</span>,</span><br><span class="line">            capture_output=<span class="literal">True</span>,</span><br><span class="line">            text=<span class="literal">True</span>,</span><br><span class="line">            timeout=<span class="number">100</span>,</span><br><span class="line">            check=<span class="literal">True</span>,</span><br><span class="line">        )</span><br><span class="line">        output = result.stdout.strip()</span><br><span class="line">        error = result.stderr.strip()</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;✅ 执行成功\n输出：<span class="subst">&#123;output&#125;</span>\n错误：<span class="subst">&#123;error&#125;</span>&quot;</span></span><br><span class="line">    <span class="keyword">except</span> subprocess.TimeoutExpired:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;❌ 超时（100秒）&quot;</span></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;❌ 失败：<span class="subst">&#123;<span class="built_in">str</span>(e)&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    mcp.run()  <span class="comment"># 默认用 stdio 启动</span></span><br></pre></td></tr></table></figure>
-<p>另外，MCP Client就可以完成Agent要用的tools的封装</p>
-<p>另外说一下传输协议的问题吧</p>
-<h3 id="传输协议"><a class="markdownIt-Anchor" href="#传输协议"></a> 传输协议</h3>
-<h4 id="本地mcp-tool"><a class="markdownIt-Anchor" href="#本地mcp-tool"></a> 本地MCP tool</h4>
-<p>本地就是用stdio，这是一种<strong>进程间管道通信协议（操作系统讲的）</strong></p>
+  </div><article class="md-text content"><img src="/myblog/images/RAG项目/1.png" width="1402" title="" crop="0,0,1,1" id="u21169f2f" class="ne-image">
+<h2 id="离线阶段"><a class="markdownIt-Anchor" href="#离线阶段"></a> 离线阶段</h2>
+<h3 id="1-数据准备和处理"><a class="markdownIt-Anchor" href="#1-数据准备和处理"></a> 1. 数据准备和处理</h3>
+<p>准备好要入库的内容，可以是markdown，pdf，txt，word，excel等等，不同文档有不同处理方式，不过都要先转化成文字。</p>
+<p>其中pdf分为文字型和扫描件类型，扫描件就先走ocr，这里常用的工具就是<a href="about:blank">Apache Tika</a>。</p>
+<p>紧接着，有了内容就要去除噪音（页眉，页脚，水印等），通常结合人工，提取元数据（Metadata），提取纯文本。</p>
+<p>有了纯文本，开始分块，不同类型文件有不同分块策略。</p>
+<p>以下我就着我自己的项目来说，适合面试拷打项目。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/zbh13782-lang/AykAI">https://github.com/zbh13782-lang/AykAI</a></p>
+<p>先丢一个表格：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>文档类型</strong></th>
+<th style="text-align:left"><strong>推荐策略</strong></th>
+<th style="text-align:left"><strong>理由</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">产品手册 / 知识库</td>
+<td style="text-align:left">递归分块</td>
+<td style="text-align:left">有清晰的章节、段落结构，递归策略能很好地利用这些结构</td>
+</tr>
+<tr>
+<td style="text-align:left">FAQ / 问答对</td>
+<td style="text-align:left">递归分块</td>
+<td style="text-align:left">每个 Q&amp;A 是一个自然单元，不应该被拆开</td>
+</tr>
+<tr>
+<td style="text-align:left">合同 / 法律文档</td>
+<td style="text-align:left">语义分块</td>
+<td style="text-align:left">条款之间的边界需要精确识别，规则分块容易切错</td>
+</tr>
+<tr>
+<td style="text-align:left">日志文件</td>
+<td style="text-align:left">固定大小分块或按行切割</td>
+<td style="text-align:left">日志通常每行一条记录，结构简单</td>
+</tr>
+<tr>
+<td style="text-align:left">代码文件</td>
+<td style="text-align:left">专用的代码分块器（按函数/类切）</td>
+<td style="text-align:left">通用的文本分块策略不适合代码，需要理解代码结构</td>
+</tr>
+<tr>
+<td style="text-align:left">HTML 页面</td>
+<td style="text-align:left">先清洗 HTML 标签，再用递归分块</td>
+<td style="text-align:left">HTML 标签会干扰分块，需要先处理</td>
+</tr>
+<tr>
+<td style="text-align:left">格式混乱的文本（OCR 等）</td>
+<td style="text-align:left">重叠分块</td>
+<td style="text-align:left">没有可靠的分隔符可用，重叠至少能缓解边界断裂</td>
+</tr>
+<tr>
+<td style="text-align:left">多类型混合的企业知识库</td>
+<td style="text-align:left">混合分块</td>
+<td style="text-align:left">不同类型的文档用不同策略，效果最好</td>
+</tr>
+</tbody>
+</table>
+<h4 id="markdown"><a class="markdownIt-Anchor" href="#markdown"></a> Markdown</h4>
+<p>这里面我用到的是父子索引设计：</p>
 <ul>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端（LangChain MCP Adapter）把 MCP Server 当成子进程启动</font></li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端 → 子进程：写 stdin</font></li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">子进程 → 客户端：写 stdout</font></li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">消息格式：每行一个 JSON‑RPC 2.0 消息</font></li>
-</ul>
-<h4 id="外部mcp-tool"><a class="markdownIt-Anchor" href="#外部mcp-tool"></a> 外部MCP tool</h4>
-<p>比如GitHub MCP Server，也是我<a href="about:blank">项目</a>里用到的那个，遵守的是 Streamable HTTP  协议，</p>
-<p>以前是http + sse，这是属于<strong>计算机网络</strong>知识。我会在网络部分的八股和Agent八股里面详细说的</p>
-<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">旧版：</font><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">HTTP + SSE（Server‑Sent Events）</font></strong></p>
+<li><strong>parent chunk（大块）存入postgre</strong>：
 <ul>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">客户端发 HTTP POST → 服务端</font></li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">服务端用 SSE 长连接推数据 → 客户端（单向流）</font></li>
-</ul>
-<p>通常是两个端点：</p>
-<p>/sse       用 GET 打开 SSE 长连接，服务端通过它推消息</p>
-<p>/messages  用 POST 发送客户端到服务端的 JSON-RPC 消息</p>
-<details class="lake-collapse"><summary id="u127396b1"><span class="ne-text">举个栗子</span></summary><ol class="ne-ol"><li id="u8a42fcee" data-lake-index-type="0"><span class="ne-text">客户端 GET /sse</span></li><li id="u744d2f6f" data-lake-index-type="0"><span class="ne-text">服务端保持这个 SSE 连接不关闭</span></li><li id="u13e041f2" data-lake-index-type="0"><span class="ne-text">服务端通过 SSE 发一个 endpoint 事件，告诉客户端 POST 地址</span></li><li id="u22fe9b71" data-lake-index-type="0"><span class="ne-text">客户端 POST /messages 发送 initialize、tools/call 等 JSON-RPC 消息</span></li><li id="u229597a8" data-lake-index-type="0"><span class="ne-text">服务端如果要回消息、推通知、发进度，就通过之前那条 SSE 长连接推给客户端</span></li></ol></details>
-<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">新版：</font><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">Streamable HTTP</font></strong></p>
-<ul>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">一个统一 HTTP 端点，同时支持：</font>
-<ul>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">POST：客户端 → 服务端（请求）</font></li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">GET+SSE：服务端 → 客户端（响应 / 流式推送）</font></li>
+<li>更接近&quot;完整语义段&quot;</li>
+<li>用于后续回填给 LLM</li>
 </ul>
 </li>
-<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">双向流、支持会话、多客户端、可重连</font><strong><font style="color:rgba(0, 0, 0, 0.5);background-color:rgba(0, 0, 0, 0.04);">Model Context Protocol</font></strong></li>
+<li><strong>child chunk（小块）同时存入milvus和es</strong>：
+<ul>
+<li>更适合向量检索和关键词检索</li>
+<li>用于召回命中</li>
 </ul>
-<p>通常有一个端点：/mcp</p>
-<details class="lake-collapse"><summary id="u20e90e14"><span class="ne-text" style="font-size: 16px">简单请求的例子</span></summary><ol class="ne-ol"><li id="uc7a43bfd" data-lake-index-type="0"><span class="ne-text">客户端 POST /mcp<br />body: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;tools/list&quot;}</span></li><li id="udc6f8896" data-lake-index-type="0"><span class="ne-text">服务端直接返回：<br />Content-Type: application/json{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;result&quot;:{...}}</span></li></ol></details>
-<details class="lake-collapse"><summary id="u3a7cf1b0"><span class="ne-text" style="font-size: 16px">流失请求的例子</span></summary><ol class="ne-ol"><li id="uf26a3f88" data-lake-index-type="0"><span class="ne-text">客户端 POST /mcp<br />body: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;method&quot;:&quot;tools/call&quot;,...}</span></li><li id="u7e97f890" data-lake-index-type="0"><span class="ne-text">服务端返回：<br />Content-Type: text/event-streamevent: message<br />data: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;notifications/progress&quot;,...}event: message<br />data: {&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:2,&quot;result&quot;:{...}}</span></li></ol></details>
-这时 SSE 只是这次 POST 响应的流式返回形式，而不是必须提前建立的一条专用 `/sse` 通道。
-<p>二者的比较：原来是专门要先让客户端发送一个GET请求，之后服务端建立一个SSE管道来进行后续的服务端到客户端通信，这中间如果断连了，服务端无法及时感知到。</p>
-<p>原来的http+sse更适合长连接情况</p>
-<p>无论是本地还是外部，都遵循了JSON-RPC2.0格式，这也是MCP存在的一个必要吧，同意了一切的工具格式</p>
-<h2 id="skill"><a class="markdownIt-Anchor" href="#skill"></a> SKILL</h2>
-<p>书接上回，讲到了MCP，那就紧接着说说skill吧，首先二者不算是同一层的东西，更像是上下层，skill教会模型具体的任务说明书，这个任务需要用到工具的时候，MCP给了模型工具的使用说明书，skill更像是一种全局策略。</p>
-<h3 id="渐进式加载动态加载"><a class="markdownIt-Anchor" href="#渐进式加载动态加载"></a> 渐进式加载（动态加载）</h3>
-<p>这是skill设计的巧妙之处，这就解决了太长的skill塞入prompt的问题，只需要把skill的name和简短的description加载到system prompt，就能实现模型的skill，这里不得不感慨Anthropic的牛比之处了，虽然MCP和SKILL现在看起来是历史的必然趋势，但是人家提出来并发扬了确实吊。。</p>
-<h2 id="agent思维范式"><a class="markdownIt-Anchor" href="#agent思维范式"></a> Agent思维范式</h2>
-<h3 id="react"><a class="markdownIt-Anchor" href="#react"></a> React</h3>
-<p>最著名的莫过于React了，这可不是前端框架。。而是Reason+act，底层就是while True</p>
-<details class="lake-collapse"><summary id="u44735e30"><span class="ne-text">流程图</span></summary><p id="ud5bdde7b" class="ne-p"><span class="ne-text">用户目标</span></p><p id="u55bdfe04" class="ne-p"><span class="ne-text">↓</span></p><p id="u9a93a1f9" class="ne-p"><span class="ne-text">Agent 判断需要什么信息</span></p><p id="uaf6b2794" class="ne-p"><span class="ne-text">↓</span></p><p id="ua39f744d" class="ne-p"><span class="ne-text">调用工具</span></p><p id="u2d5fe46b" class="ne-p"><span class="ne-text">↓</span></p><p id="uea3f2961" class="ne-p"><span class="ne-text">观察工具返回</span></p><p id="ufb99c586" class="ne-p"><span class="ne-text">↓</span></p><p id="u3dcbde76" class="ne-p"><span class="ne-text">继续推理</span></p><p id="ubc9b6884" class="ne-p"><span class="ne-text">↓</span></p><p id="u55ae0485" class="ne-p"><span class="ne-text">再调用工具或输出答案</span></p></details>
-langchain其实自己封装的create_agent函数用到的就是这个范式。
-<h3 id="plan-and-execute"><a class="markdownIt-Anchor" href="#plan-and-execute"></a> <strong>Plan-and-Execute</strong></h3>
-<p>这个也顾名思义了，后面还有replan，也就是agent自己再次细分计划的过程</p>
-<details class="lake-collapse"><summary id="u841cc2b2"><span class="ne-text">流程图</span></summary><p id="u145865cd" class="ne-p"><span class="ne-text">目标</span></p><p id="uf4a648bb" class="ne-p"><span class="ne-text">  ↓</span></p><p id="ubec23988" class="ne-p"><span class="ne-text">拆解任务</span></p><p id="u74411d13" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u885c25bc" class="ne-p"><span class="ne-text">形成步骤计划</span></p><p id="uf2b32bd9" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u2a09d3c8" class="ne-p"><span class="ne-text">逐步执行</span></p><p id="u2c5cea4d" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u801a0422" class="ne-p"><span class="ne-text">汇总结果</span></p></details>
-### Reflection
-反思，顾名思义
-<details class="lake-collapse"><summary id="u6a811f6c"><span class="ne-text">流程图</span></summary><p id="uc34242a7" class="ne-p"><span class="ne-text">生成初稿</span></p><p id="ub941275c" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u16f34591" class="ne-p"><span class="ne-text">自我检查</span></p><p id="u07ffb4d0" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u47267740" class="ne-p"><span class="ne-text">发现问题</span></p><p id="ua1d4aa26" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u6414d97f" class="ne-p"><span class="ne-text">修改</span></p><p id="u59a31d5f" class="ne-p"><span class="ne-text">  ↓</span></p><p id="u26687fed" class="ne-p"><span class="ne-text">再次检查</span></p></details>
-无论哪个吧，最最重要的我觉得还是Human in the Loop，一定要管理好agent的行为，也是Harness工程的核心。
-<h2 id="single-agent和multi-agent"><a class="markdownIt-Anchor" href="#single-agent和multi-agent"></a> Single-Agent和Multi-Agent</h2>
-<h3 id="single-agent"><a class="markdownIt-Anchor" href="#single-agent"></a> Single Agent</h3>
-<p>单Agent工作，优点是适合小工作，因为记忆有限的问题，在处理小问题的时候非常好用。</p>
-<p>缺点就是一个Agent要是干大工作要累死，还是因为上下文的问题。</p>
-<h3 id="multi-agent"><a class="markdownIt-Anchor" href="#multi-agent"></a> Multi Agent</h3>
-<h4 id="a2a"><a class="markdownIt-Anchor" href="#a2a"></a> A2A</h4>
-<p>Google推出的一个协议，解决多Agent之间的通信问题</p>
-<h4 id="分工问题"><a class="markdownIt-Anchor" href="#分工问题"></a> 分工问题</h4>
-<p>有了多Agent，就很好解决了单Agent的上下文问题了，比如某个任务需要很干净的上下文去做（搜索网页之类的），只需要子Agent把返回的结果和总结给到Leader，而不要关注你搜索到多少，搜索到多好。</p>
-<p>同时，加入我自己的一些理解，一定不要让Agent自主决定去开一个子Agent干，而是要加入人为干预，写入system prompt，什么任务可以开子Agent，什么任务可以交给别的Agent来干</p>
-<p>举个例子：</p>
-<p>1.父Agent传入了错误信息，那子Agent又不知道是错的，干脆一错到底。</p>
-<p>2.比如code过程</p>
-<p>Leader 设计方案，说设计没问题</p>
-<p>Coder 写代码，说按计划写的</p>
-<p>Tester 跑测试，说环境不完整</p>
-<p>Reviewer 提意见，说我只是审查</p>
-<p>最后活不还是全都交给Leader做了吗，阴阳一手大学小组分工</p>
-<h2 id="结尾"><a class="markdownIt-Anchor" href="#结尾"></a> 结尾</h2>
-<p>写完这篇文章我再自己看一下，感觉逻辑好像很混乱，但是我自己看懂就行了。。后面继续写一个项目相关的文章，主要针对面试，押一下面试问的问题，然后写关于数据库的八股和网络的八股吧，五一假期应该可以玩完。</p>
+</li>
+</ul>
+<p>首先大块按照H1，H2分出来，再去递归分。</p>
+<p>之后切小块（语义分块），这里面很有讲究，小块要完整保留到代码块，除非是代码块很大就可以按照代码块切分策略（类class、函数function），不过应该没人这么做。</p>
+<p>小块还有表格类型，正常段落类型等等，同时要注意保留好元数据，特别是parent_id。</p>
+<h4 id="pdf"><a class="markdownIt-Anchor" href="#pdf"></a> PDF</h4>
+<p>这里其实就覆盖了ppt，word了，因为ppt和word都可以转化成PDF，也是比较重要的一个点。</p>
+<p>通常对于pdf就直接采取重叠切分了。不过一定要注意<strong>数据清洗</strong>。</p>
+<h3 id="2-向量化"><a class="markdownIt-Anchor" href="#2-向量化"></a> 2. 向量化</h3>
+<p>使用bge-m3模型。</p>
+<h3 id="3-数据库构建"><a class="markdownIt-Anchor" href="#3-数据库构建"></a> 3. 数据库构建</h3>
+<p>大块入postgre，小块分别入milvus和es，构建好索引。</p>
+<p>向量维度通常1536（几乎没必要），512，768，1024，具体看embed模型。</p>
+<p>注意：一个collection只用一个维度。</p>
+<p>milvus用到了HNSW，HNSW 的核心结构是一个多层图：</p>
+<ul>
+<li>最底层（Layer 0）包含所有向量，每个向量和它附近的若干个向量相连</li>
+<li>往上每一层的向量数量越来越少（随机抽取），但连接的跨度越来越大</li>
+<li>最顶层只有很少的几个向量，但它们之间的连接覆盖了整个向量空间</li>
+</ul>
+<p>检索的时候，从最顶层开始，快速定位到目标的大致区域，然后逐层下降，每一层都在更精细的范围内搜索，最终在最底层找到最相似的向量。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><strong>索引类型</strong></th>
+<th style="text-align:left"><strong>核心思想</strong></th>
+<th style="text-align:left"><strong>检索速度</strong></th>
+<th style="text-align:left"><strong>召回率</strong></th>
+<th style="text-align:left"><strong>内存占用</strong></th>
+<th style="text-align:left"><strong>适用数据量</strong></th>
+<th style="text-align:left"><strong>适用场景</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">FLAT</td>
+<td style="text-align:left">暴力搜索，不建索引</td>
+<td style="text-align:left">最慢</td>
+<td style="text-align:left">100%（精确）</td>
+<td style="text-align:left">低（只存原始向量）</td>
+<td style="text-align:left">&lt; 10 万</td>
+<td style="text-align:left">对精度要求极高，数据量小</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_FLAT</td>
+<td style="text-align:left">聚类分区 + 簇内精确搜索</td>
+<td style="text-align:left">快</td>
+<td style="text-align:left">95%~99%</td>
+<td style="text-align:left">较低</td>
+<td style="text-align:left">百万~千万</td>
+<td style="text-align:left">数据量大，内存有限</td>
+</tr>
+<tr>
+<td style="text-align:left">IVF_SQ8</td>
+<td style="text-align:left">聚类分区 + 标量量化压缩</td>
+<td style="text-align:left">快</td>
+<td style="text-align:left">93%~97%</td>
+<td style="text-align:left">低（向量压缩为 1/4）</td>
+<td style="text-align:left">千万~亿级</td>
+<td style="text-align:left">数据量很大，愿意牺牲一点精度换内存</td>
+</tr>
+<tr>
+<td style="text-align:left">HNSW</td>
+<td style="text-align:left">多层图结构</td>
+<td style="text-align:left">最快</td>
+<td style="text-align:left">97%~99.5%</td>
+<td style="text-align:left">高（需存图结构）</td>
+<td style="text-align:left">百万~千万</td>
+<td style="text-align:left">对速度和精度都有要求，内存充足</td>
+</tr>
+<tr>
+<td style="text-align:left">DISKANN</td>
+<td style="text-align:left">基于磁盘的图索引</td>
+<td style="text-align:left">较快</td>
+<td style="text-align:left">95%~98%</td>
+<td style="text-align:left">低（索引在磁盘）</td>
+<td style="text-align:left">亿级</td>
+<td style="text-align:left">数据量极大，内存不够放 HNSW</td>
+</tr>
+</tbody>
+</table>
+<p>使用建议：</p>
+<ul>
+<li>数据量 &lt; 10 万，直接用 FLAT，暴力搜索就够了</li>
+<li>数据量 10 万~500 万，内存充足 → HNSW；内存有限 → IVF_FLAT</li>
+<li>数据量 500 万~5000 万，HNSW 如果内存放得下就用 HNSW，放不下用 IVF_SQ8</li>
+<li>数据量 &gt; 5000 万，考虑 DISKANN 或 IVF_PQ</li>
+</ul>
+<p>es存小块，采用IK分词器。</p>
+<h2 id="在线阶段"><a class="markdownIt-Anchor" href="#在线阶段"></a> 在线阶段</h2>
+<h3 id="1-query重写"><a class="markdownIt-Anchor" href="#1-query重写"></a> 1. query重写</h3>
+<p>调用一个<strong>子agent</strong>重写，因为这个agent需要知道上下文记忆。重写出来3-5个问题：</p>
+<p>第一是直接改写，让 LLM 把口语化的问题转成更精准的表述；第二是 Query 扩展，补充相关关键词；第三是 HyDE，让 LLM 先生成一个假设答案，然后用答案的向量去检索；第四是 Step-back Prompting，把具体问题往上抽象一层，检索更通用的背景知识。</p>
+<p>本质还是上下文工程了，后面带着改好的内容。</p>
+<h3 id="2-多路检索"><a class="markdownIt-Anchor" href="#2-多路检索"></a> 2. 多路检索</h3>
+<p>向量检索了k个，es检索了m个，采用RRF混合。</p>
+<ul>
+<li><strong>向量检索结果列表 A</strong>：包含 k 个小块文档，按余弦相似度降序排列。</li>
+<li><strong>ES 检索结果列表 B</strong>：包含 m 个小块文档，按 BM25 分数降序排列。</li>
+</ul>
+<p><code>RRF_score(d) = Σ 1 / (k_constant + rank_i(d))</code></p>
+<p>混合后去重，之后进行重排序，这里又需要调用Cross-Encoder模型了，最终得到top-k个最终结果，根据parent_id去pg得到父块。</p>
+<h3 id="3-装填上下文并回答"><a class="markdownIt-Anchor" href="#3-装填上下文并回答"></a> 3. 装填上下文并回答</h3>
+<h2 id="q-a"><a class="markdownIt-Anchor" href="#q-a"></a> Q &amp; A</h2>
+<h3 id="1-租户隔离问题"><a class="markdownIt-Anchor" href="#1-租户隔离问题"></a> 1. 租户隔离问题</h3>
+<p>不同部门，用户查询到不同信息，这个怎么做？</p>
+<ol>
+<li>所有chunk带着tenant_id，检索的时候添加过滤条件</li>
+<li>可以不同部门分不同的collection，partition，但部门种类多了，分区也多了</li>
+<li>权限上隔离：用户登陆之后，服务端鉴权，从JWT中解析出来了tenant_id,注入检索的过滤条件</li>
+</ol>
+<p>登录成功后，认证服务签发 JWT：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;sub&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user_123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tenant_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;tenant_a&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;roles&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;admin&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;permissions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;rag:read&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exp&quot;</span><span class="punctuation">:</span> <span class="number">1730000000</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>后端强制校验bind到tenant_id。</p>
+<ol start="4">
+<li>召回时再次较验chunk的tenantid，只把合法的放入上下文。</li>
+</ol>
+<h3 id="2-新旧文档问题怎么动态更新"><a class="markdownIt-Anchor" href="#2-新旧文档问题怎么动态更新"></a> 2. 新旧文档问题（怎么动态更新）</h3>
+<h4 id="常用思路"><a class="markdownIt-Anchor" href="#常用思路"></a> 常用思路</h4>
+<h5 id="增量更新"><a class="markdownIt-Anchor" href="#增量更新"></a> 增量更新</h5>
+<p>直接在原来文档的基础上做增量更新，这样是最理想的。</p>
+<h5 id="修改原来x"><a class="markdownIt-Anchor" href="#修改原来x"></a> 修改原来（X）</h5>
+<p>只修改了某个句子，那就只改那个句子对应的chunk，这样看起来没问题，但实际上要考虑的问题也多了，比如一个句子同时对应两个chunk呢，这实际上是一个错误的方法。</p>
+<h5 id="重新加载"><a class="markdownIt-Anchor" href="#重新加载"></a> 重新加载</h5>
+<p>删掉对应文件，重新入库，对待修改的文档，只能采取这种方式。</p>
+<h4 id="如何知道文档内容变化"><a class="markdownIt-Anchor" href="#如何知道文档内容变化"></a> 如何知道文档内容变化</h4>
+<p>内容hash，计算文档内容的MD5或者SHA256摘要，把hash，chunk-id，文档id存入数据库，下次查到这个文章时，重新计算hash值对比数据库的值。</p>
+<p>缺点：每次都算hash，性能开销大。</p>
+<p>解决方法：用<strong>最后修改时间</strong>这个字段粗筛，变化的文章才算hash。</p>
+<h3 id="3-优化策略"><a class="markdownIt-Anchor" href="#3-优化策略"></a> 3. 优化策略</h3>
+<h4 id="批处理"><a class="markdownIt-Anchor" href="#批处理"></a> 批处理</h4>
+<p>批处理流程：</p>
+<ol>
+<li>多文件上传</li>
+<li>↓ 异步解析</li>
+<li>↓ 清洗分块</li>
+<li>↓ 批量向量化</li>
+<li>↓ 批量写入向量库</li>
+<li>↓ 状态可追踪、可重试、可增量更新</li>
+</ol>
+<p>注意在过程中保留好chunk_id这些元数据，随后embeding时候可以：</p>
+<ul>
+<li><strong>批量 Embedding</strong>：调用 Embedding 模型时，尽量使用批量处理接口（例如 <code>embedding.embed_documents()</code>），将多个文本块一次性传入。相比单条处理，批量处理的速度通常能提升 3-5 倍。</li>
+<li><strong>多线程/并发处理</strong>：在处理大量文件时，可以利用多线程或异步并发机制进行批量向量化，进一步榨干硬件性能，缩短整体入库时间。</li>
+</ul>
+<h3 id="4-你遇到最大的困难是什么"><a class="markdownIt-Anchor" href="#4-你遇到最大的困难是什么"></a> 4. 你遇到最大的困难是什么</h3>
+<p>文档清洗，chunk切分问题，效果评估的黑盒问题。</p>
+<h3 id="5-怎么评估你的rag效果"><a class="markdownIt-Anchor" href="#5-怎么评估你的rag效果"></a> 5. 怎么评估你的RAG效果</h3>
+<p>具体可以看<a target="_blank" rel="noopener" href="https://xiaolinnote.com/ai/rag/18_evaluation.html#%E4%BB%80%E4%B9%88%E6%98%AF-rag-%E8%AF%84%E4%BC%B0">小林的这个文章</a>。</p>
+<p>分三个方面看：</p>
+<h4 id="1-检索层"><a class="markdownIt-Anchor" href="#1-检索层"></a> 1. 检索层</h4>
+<ul>
+<li>recall@k：在top-k个结果里面是否有正确答案，比如recall@5 = 1表示命中了</li>
+<li>hit rate：是否命中过</li>
+<li>MRR：正确答案排在第几？越靠前越好</li>
+</ul>
+<p>比如：</p>
+<ul>
+<li>排第1 → 1.0</li>
+<li>排第2 → 0.5</li>
+<li>排第5 → 0.2</li>
+</ul>
+<p>评估流程：<br />
+先做一个评估数据集：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="string">&quot;宫保鸡丁怎么做&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;gold_doc_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;doc_123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;gold_chunk_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;chunk_456&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>看是否命中gold chunk，计算recall@k，如果 &lt; 0.7说明rag设计的基本不可用。</p>
+<h4 id="2-生成层"><a class="markdownIt-Anchor" href="#2-生成层"></a> 2. 生成层</h4>
+<p>主要借助RAGas。</p>
+<p>指标：</p>
+<ul>
+<li><strong>Faithfulness（忠实性）：回答是否基于检索内容</strong></li>
+<li><strong>Correctness（正确性）：回答是否正确</strong></li>
+<li><strong>Relevance（相关性）：是否回答了问题</strong></li>
+</ul>
+<p><strong>方法1：人工评估（最准）</strong></p>
+<p><strong>方法2：LLM as a judge</strong></p>
+<h3 id="6-rag和微调的区别"><a class="markdownIt-Anchor" href="#6-rag和微调的区别"></a> 6. RAG和微调的区别</h3>
+<p>这里就涉及到fine tuning了，以后我会单独讲一遍。</p>
+<p>微调实际上是修改了模型参数，让模型学习专业的东西，更定制化，但代价很高，特别是出现新旧文档问题的时候更加明显。</p>
+<p>RAG是在模型回答的时候把文档塞到prompt，类似开卷考试，但这个过程的缺点也明显：延迟高。</p>
+<table>
+<thead>
+<tr>
+<th><strong>场景</strong></th>
+<th><strong>用 RAG</strong></th>
+<th><strong>用微调</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文档问答</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>知识库更新频繁</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>私有数据</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>固定格式输出</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>风格控制</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>推理能力增强</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>代码风格统一</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>事实性知识</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
 </article>
 <div class="article-footer">
     <section id="license">
@@ -190,7 +406,7 @@ langchain其实自己封装的create_agent函数用到的就是这个范式。
 
 </div>
 
-<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/04/30/RAG%E9%A1%B9%E7%9B%AE/">RAG项目相关问题</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/myblog/2026/05/02/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/">Agent的一些概念和一些碎碎念</a></div><div class="item" id="next"><div class="note">Older</div><a href="/myblog/2026/04/19/sync.map/">sync.map</a></div></section></div>
 
 
 
@@ -206,7 +422,7 @@ langchain其实自己封装的create_agent函数用到的就是这个范式。
 
 
 
-<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#function-calling%E5%92%8Cmcp"><span class="toc-text"> Function Calling和MCP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E6%83%85%E6%8F%90%E8%A6%81"><span class="toc-text"> 前情提要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE"><span class="toc-text"> 传输协议</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0mcp-tool"><span class="toc-text"> 本地MCP tool</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E9%83%A8mcp-tool"><span class="toc-text"> 外部MCP tool</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#skill"><span class="toc-text"> SKILL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%90%E8%BF%9B%E5%BC%8F%E5%8A%A0%E8%BD%BD%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD"><span class="toc-text"> 渐进式加载（动态加载）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#agent%E6%80%9D%E7%BB%B4%E8%8C%83%E5%BC%8F"><span class="toc-text"> Agent思维范式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#react"><span class="toc-text"> React</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#plan-and-execute"><span class="toc-text"> Plan-and-Execute</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#single-agent%E5%92%8Cmulti-agent"><span class="toc-text"> Single-Agent和Multi-Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#single-agent"><span class="toc-text"> Single Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#multi-agent"><span class="toc-text"> Multi Agent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#a2a"><span class="toc-text"> A2A</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%B7%A5%E9%97%AE%E9%A2%98"><span class="toc-text"> 分工问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E5%B0%BE"><span class="toc-text"> 结尾</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5"><span class="toc-text"> 离线阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87%E5%92%8C%E5%A4%84%E7%90%86"><span class="toc-text"> 1. 数据准备和处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#markdown"><span class="toc-text"> Markdown</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pdf"><span class="toc-text"> PDF</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%90%91%E9%87%8F%E5%8C%96"><span class="toc-text"> 2. 向量化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9E%84%E5%BB%BA"><span class="toc-text"> 3. 数据库构建</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E9%98%B6%E6%AE%B5"><span class="toc-text"> 在线阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-query%E9%87%8D%E5%86%99"><span class="toc-text"> 1. query重写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A4%9A%E8%B7%AF%E6%A3%80%E7%B4%A2"><span class="toc-text"> 2. 多路检索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%A3%85%E5%A1%AB%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B9%B6%E5%9B%9E%E7%AD%94"><span class="toc-text"> 3. 装填上下文并回答</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#q-a"><span class="toc-text"> Q &amp; A</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%A7%9F%E6%88%B7%E9%9A%94%E7%A6%BB%E9%97%AE%E9%A2%98"><span class="toc-text"> 1. 租户隔离问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%96%B0%E6%97%A7%E6%96%87%E6%A1%A3%E9%97%AE%E9%A2%98%E6%80%8E%E4%B9%88%E5%8A%A8%E6%80%81%E6%9B%B4%E6%96%B0"><span class="toc-text"> 2. 新旧文档问题（怎么动态更新）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E6%80%9D%E8%B7%AF"><span class="toc-text"> 常用思路</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0"><span class="toc-text"> 增量更新</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%8E%9F%E6%9D%A5x"><span class="toc-text"> 修改原来（X）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD"><span class="toc-text"> 重新加载</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%9F%A5%E9%81%93%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%8F%98%E5%8C%96"><span class="toc-text"> 如何知道文档内容变化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-text"> 3. 优化策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%B9%E5%A4%84%E7%90%86"><span class="toc-text"> 批处理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BD%A0%E9%81%87%E5%88%B0%E6%9C%80%E5%A4%A7%E7%9A%84%E5%9B%B0%E9%9A%BE%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text"> 4. 你遇到最大的困难是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%80%8E%E4%B9%88%E8%AF%84%E4%BC%B0%E4%BD%A0%E7%9A%84rag%E6%95%88%E6%9E%9C"><span class="toc-text"> 5. 怎么评估你的RAG效果</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%A3%80%E7%B4%A2%E5%B1%82"><span class="toc-text"> 1. 检索层</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E7%94%9F%E6%88%90%E5%B1%82"><span class="toc-text"> 2. 生成层</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-rag%E5%92%8C%E5%BE%AE%E8%B0%83%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text"> 6. RAG和微调的区别</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
@@ -220,7 +436,7 @@ langchain其实自己封装的create_agent函数用到的就是这个范式。
 
 <script type="text/javascript">
   window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
-  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/05/01/Agent%E9%9B%B6%E7%A2%8E%E6%A6%82%E5%BF%B5/","checklink":"/js/plugins/video.js"};
+  window.canonical["param"] = {"permalink":"https://zbh13782-lang.github.io/myblog/2026/05/02/RAG%E9%A1%B9%E7%9B%AE/","checklink":"/js/plugins/video.js"};
   // Fix: Ensure page is at the correct top position on data load
   if (history.scrollRestoration) {
     history.scrollRestoration = 'auto';
