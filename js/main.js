@@ -299,6 +299,9 @@ stellar.initPage = function () {
   init.sidebar();
   init.relativeDate(document.querySelectorAll('#post-meta time'));
   init.registerTabsTag();
+  if (stellar.initYuiPet) {
+    stellar.initYuiPet();
+  }
   
   // Reinitialize comments after PJAX navigation
   if (stellar.initComments) {
